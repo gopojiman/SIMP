@@ -1,7 +1,7 @@
 
 while : *.h *.cpp
-	clang++ -std=c++14 *.cpp -o while
+	clang++ -std=c++14 *.cpp -o simp
 
 clean :
-	- rm while
-	- rm -r while.dSYM
+	- rm simp
+	- rm -r simp.dSYM

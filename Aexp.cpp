@@ -25,7 +25,7 @@ VarExpr::VarExpr(string name) {
 }
 
 int VarExpr::eval(Store *store) {
-    return store->get(name);
+    return store->getVar(name);
 }
 
 Aexp *VarExpr::copy() {

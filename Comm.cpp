@@ -16,7 +16,7 @@ AssignComm::AssignComm(string varName, Aexp *aexpr) {
 }
 
 void AssignComm::eval(Store *store) {
-    store->put(varName, aexpr->eval(store));
+    store->putVar(varName, aexpr->eval(store));
 }
 
 AssignComm::~AssignComm() {

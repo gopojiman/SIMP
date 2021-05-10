@@ -8,11 +8,11 @@ using namespace std;
 
 class Store {
     private:
-        map<string, int> storeMap;
+        map<string, int> varMap;
     
     public:
-        void put(string key, int val);
-        int get(string key);
+        void putVar(string key, int val);
+        int getVar(string key);
     
     friend ostream& operator << (ostream& os, const Store &store);
 };

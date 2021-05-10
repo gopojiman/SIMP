@@ -3,13 +3,13 @@
 #include "Store.h"
 using namespace std;
 
-void Store::put(string key, int val) {
-    storeMap[key] = val;
+void Store::putVar(string key, int val) {
+    varMap[key] = val;
 }
 
-int Store::get(string key) {
-    auto it = storeMap.find(key);
-    if (it != storeMap.end()) {
+int Store::getVar(string key) {
+    auto it = varMap.find(key);
+    if (it != varMap.end()) {
         return it->second;
     }
     else {
@@ -19,8 +19,8 @@ int Store::get(string key) {
 
 ostream& operator << (ostream &os, const Store &store) {
     os << '{';
-    auto it = store.storeMap.begin();
-    auto end = store.storeMap.end();
+    auto it = store.varMap.begin();
+    auto end = store.varMap.end();
     if (it != end) {
         os << it->first << " → " << it->second;
         it++;
