@@ -1,6 +1,7 @@
 
-while-ss : *.h *.cpp
-	clang++ -std=c++14 *.cpp -o while-ss
+while : *.h *.cpp
+	clang++ -std=c++14 *.cpp -o while
 
 clean :
-	rm while-ss
+	- rm while
+	- rm -r while.dSYM

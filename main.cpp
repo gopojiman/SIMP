@@ -13,10 +13,9 @@ int main() {
 
     Parser parser = Parser(inputStr);
     Comm* comm = parser.parseComm();
-    comm = comm->eval(store);
-    for (int i = 0; comm != NULL && i < 10000; i++) {
-        cout << "⇒ " << comm->show() << ", " << *store << endl;
-        comm = comm->eval(store);
-    }
+
+    comm->eval(store);
+    cout << *store << endl;
+    delete comm;
     delete store;
 }

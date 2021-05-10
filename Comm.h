@@ -8,19 +8,13 @@
 
 class Comm {
     public:
-        virtual Comm *eval(Store *store) = 0;
-        virtual Comm *copy() = 0;
-        virtual string show() = 0;
-        // delete is shallow for some Comms, obliterate is deep deletion
-        virtual void obliterate();
+        virtual void eval(Store *store) = 0;
         virtual ~Comm() = default;
 };
 
 class SkipComm: public Comm {
     public:
-        Comm *eval(Store *store);
-        Comm *copy();
-        string show();
+        void eval(Store *store);
 };
 
 class AssignComm: public Comm {
@@ -30,9 +24,7 @@ class AssignComm: public Comm {
 
     public:
         AssignComm(string varName, Aexp *aexpr);
-        Comm *eval(Store *store);
-        Comm *copy();
-        string show();
+        void eval(Store *store);
         ~AssignComm();
 };
 
@@ -43,10 +35,8 @@ class SeqComm: public Comm {
 
     public:
         SeqComm(Comm *left, Comm *right);
-        Comm *eval(Store *store);
-        Comm *copy();
-        string show();
-        void obliterate();
+        void eval(Store *store);
+        ~SeqComm();
 };
 
 class IfComm: public Comm {
@@ -57,10 +47,8 @@ class IfComm: public Comm {
 
     public:
         IfComm(Bexp *cond, Comm *trueComm, Comm *falseComm);
-        Comm *eval(Store *store);
-        Comm *copy();
-        string show();
-        void obliterate();
+        void eval(Store *store);
+        ~IfComm();
 };
 
 class WhileComm: public Comm {
@@ -70,9 +58,7 @@ class WhileComm: public Comm {
 
     public:
         WhileComm(Bexp *cond, Comm *body);
-        Comm *eval(Store *store);
-        Comm *copy();
-        string show();
+        void eval(Store *store);
         ~WhileComm();
 };
 
