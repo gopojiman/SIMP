@@ -19,6 +19,8 @@ Parser::Parser(string str) {
     delete[] c_str;
 }
 
+// given a closing parenthese at position i, iterates
+// backwards to find the matching opening parenthese
 int Parser::skipToMatchingParen(int i, int start) {
     int j = i - 1;
     while (j >= start) {
@@ -34,6 +36,8 @@ int Parser::skipToMatchingParen(int i, int start) {
     exit(1);
 }
 
+// given a closing bracket at position i, iterates
+// backwards to find the matching opening bracket
 int Parser::skipToMatchingBracket(int i, int start) {
     int j = i - 1;
     while (j >= start) {
@@ -49,6 +53,8 @@ int Parser::skipToMatchingBracket(int i, int start) {
     exit(1);
 }
 
+// given a closing "then" at position i, iterates
+// forwards to find the matching "else"
 int Parser::skipToMatchingElse(int i, int end) {
     int j = i + 2;
     while (j <= end) {
@@ -62,10 +68,6 @@ int Parser::skipToMatchingElse(int i, int end) {
     }
     cerr << "Error: Matching Else Not Found" << endl;
     exit(1);
-}
-
-Aexp *Parser::parseAexp() {
-    return parseAexp(0, tokens.size() - 1);
 }
 
 Aexp *Parser::parseAexp(int start, int end) {
@@ -124,10 +126,6 @@ Aexp *Parser::parseAexp(int start, int end) {
     exit(1);
 }
 
-Bexp *Parser::parseBexp() {
-    return parseBexp(0, tokens.size() - 1);
-}
-
 Bexp *Parser::parseBexp(int start, int end) {
     if (start == end) {
         string token = tokens[start];
@@ -141,12 +139,12 @@ Bexp *Parser::parseBexp(int start, int end) {
 
     int i = end;
     while (i >= start) {
-        if (tokens[i] == "∧") {
+        if (tokens[i] == "&&") {
             Bexp *left = parseBexp(start, i - 1);
             Bexp *right = parseBexp(i + 1, end);
             return new AndExpr(left, right);
         }
-        if (tokens[i] == "∨") {
+        if (tokens[i] == "||") {
             Bexp *left = parseBexp(start, i - 1);
             Bexp *right = parseBexp(i + 1, end);
             return new OrExpr(left, right);
@@ -161,13 +159,13 @@ Bexp *Parser::parseBexp(int start, int end) {
         i--;
     }
 
-    if (start < end && tokens[start] == "¬") {
+    if (start < end && tokens[start] == "!") {
         return new NotExpr(parseBexp(start + 1, end));
     }
 
     i = end;
     while (i >= start) {
-        if (tokens[i] == "=") {
+        if (tokens[i] == "==") {
             Aexp *left = parseAexp(start, i - 1);
             Aexp *right = parseAexp(i + 1, end);
             return new EqExpr(left, right);
@@ -232,7 +230,7 @@ Comm *Parser::parseComm(int start, int end) {
         }
     }
 
-    if (end - start > 1 && tokens[start + 1] == ":=") {
+    if (end - start > 1 && tokens[start + 1] == "=") {
         Aexp *aexpr = parseAexp(start + 2, end);
         return new AssignComm(tokens[start], aexpr);
     }

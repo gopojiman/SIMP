@@ -20,9 +20,7 @@ class Parser {
 
     public:
         Parser(string str);
-        Aexp *parseAexp();
-        Bexp *parseBexp();
-        Comm *parseComm();
+        Comm *parseComm(); // allocates a new Comm, must call delete after
 };
 
 #endif
