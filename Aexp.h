@@ -7,11 +7,7 @@
 class Aexp {
     public:
         virtual int eval(Store *store) = 0;
-        virtual Aexp *copy() = 0;
-        virtual string show() = 0;
         virtual ~Aexp() = default;
-    
-    friend ostream& operator << (ostream& os, const Store &store);
 };
 
 class NumExpr: public Aexp {
@@ -21,8 +17,6 @@ class NumExpr: public Aexp {
     public:
         NumExpr(int val);
         int eval(Store *store);
-        Aexp *copy();
-        string show();
 };
 
 class VarExpr: public Aexp {
@@ -32,8 +26,6 @@ class VarExpr: public Aexp {
     public:
         VarExpr(string name);
         int eval(Store *store);
-        Aexp *copy();
-        string show();
 };
 
 class AddExpr: public Aexp {
@@ -44,8 +36,6 @@ class AddExpr: public Aexp {
     public:
         AddExpr(Aexp *left, Aexp *right);
         int eval(Store *store);
-        Aexp *copy();
-        string show();
         ~AddExpr();
 };
 
@@ -57,8 +47,6 @@ class SubExpr: public Aexp {
     public:
         SubExpr(Aexp *left, Aexp *right);
         int eval(Store *store);
-        Aexp *copy();
-        string show();
         ~SubExpr();
 };
 
@@ -70,8 +58,6 @@ class MultExpr: public Aexp {
     public:
         MultExpr(Aexp *left, Aexp *right);
         int eval(Store *store);
-        Aexp *copy();
-        string show();
         ~MultExpr();
 };
 

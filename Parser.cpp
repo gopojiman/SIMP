@@ -7,7 +7,7 @@
 #include "Comm.h"
 using namespace std;
 
-Parser::Parser(string str) {
+Parser::Parser(const string& str) {
     char *c_str = new char[str.length() + 1];
     strcpy(c_str, str.c_str());
     char *token = strtok(c_str, " ");

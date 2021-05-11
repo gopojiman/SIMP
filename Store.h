@@ -11,10 +11,10 @@ class Store {
         map<string, int> varMap;
     
     public:
-        void putVar(string key, int val);
-        int getVar(string key);
+        void putVar(const string& key, int val);
+        int getVar(const string& key);
     
-    friend ostream& operator << (ostream& os, const Store &store);
+    friend ostream& operator << (ostream& os, const Store& store);
 };
 
 #endif

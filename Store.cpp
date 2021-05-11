@@ -3,11 +3,11 @@
 #include "Store.h"
 using namespace std;
 
-void Store::putVar(string key, int val) {
+void Store::putVar(const string& key, int val) {
     varMap[key] = val;
 }
 
-int Store::getVar(string key) {
+int Store::getVar(const string& key) {
     auto it = varMap.find(key);
     if (it != varMap.end()) {
         return it->second;
@@ -17,7 +17,7 @@ int Store::getVar(string key) {
     }
 }
 
-ostream& operator << (ostream &os, const Store &store) {
+ostream& operator << (ostream& os, const Store& store) {
     os << '{';
     auto it = store.varMap.begin();
     auto end = store.varMap.end();

@@ -19,7 +19,7 @@ class Parser {
         Comm *parseComm(int start, int end);
 
     public:
-        Parser(string str);
+        Parser(const string& str);
         Comm *parseComm(); // allocates a new Comm, must call delete after
 };
 
