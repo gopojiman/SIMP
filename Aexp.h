@@ -6,7 +6,7 @@
 
 class Aexp {
     public:
-        virtual int eval(Store *store) = 0;
+        virtual int eval(Store& store) = 0;
         virtual ~Aexp() = default;
 };
 
@@ -16,7 +16,7 @@ class NumExpr: public Aexp {
 
     public:
         NumExpr(int val);
-        int eval(Store *store);
+        int eval(Store& store);
 };
 
 class VarExpr: public Aexp {
@@ -25,7 +25,7 @@ class VarExpr: public Aexp {
 
     public:
         VarExpr(string name);
-        int eval(Store *store);
+        int eval(Store& store);
 };
 
 class AddExpr: public Aexp {
@@ -35,7 +35,7 @@ class AddExpr: public Aexp {
     
     public:
         AddExpr(Aexp *left, Aexp *right);
-        int eval(Store *store);
+        int eval(Store& store);
         ~AddExpr();
 };
 
@@ -46,7 +46,7 @@ class SubExpr: public Aexp {
     
     public:
         SubExpr(Aexp *left, Aexp *right);
-        int eval(Store *store);
+        int eval(Store& store);
         ~SubExpr();
 };
 
@@ -57,7 +57,7 @@ class MultExpr: public Aexp {
     
     public:
         MultExpr(Aexp *left, Aexp *right);
-        int eval(Store *store);
+        int eval(Store& store);
         ~MultExpr();
 };
 

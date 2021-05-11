@@ -7,7 +7,7 @@ using namespace std;
 
 
 int main() {
-    Store *store = new Store();
+    Store store;
     string inputStr;
     getline(cin, inputStr);
 
@@ -15,7 +15,6 @@ int main() {
     Comm* comm = parser.parseComm();
 
     comm->eval(store);
-    cout << *store << endl;
+    cout << store << endl;
     delete comm;
-    delete store;
 }

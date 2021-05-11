@@ -4,12 +4,12 @@
 #include "Store.h"
 
 // TrueExpr
-bool TrueExpr::eval(Store *store) {
+bool TrueExpr::eval(Store& store) {
     return true;
 }
 
 // FalseExpr
-bool FalseExpr::eval(Store *store) {
+bool FalseExpr::eval(Store& store) {
     return false;
 }
 
@@ -19,7 +19,7 @@ EqExpr::EqExpr(Aexp *left, Aexp *right) {
     this->right = right;
 }
 
-bool EqExpr::eval(Store *store) {
+bool EqExpr::eval(Store& store) {
     return left->eval(store) == right->eval(store);
 }
 
@@ -34,7 +34,7 @@ LessExpr::LessExpr(Aexp *left, Aexp *right) {
     this->right = right;
 }
 
-bool LessExpr::eval(Store *store) {
+bool LessExpr::eval(Store& store) {
     return left->eval(store) < right->eval(store);
 }
 
@@ -48,7 +48,7 @@ NotExpr::NotExpr(Bexp *oper) {
     this->oper = oper;
 }
 
-bool NotExpr::eval(Store *store) {
+bool NotExpr::eval(Store& store) {
     return !(oper->eval(store));
 }
 
@@ -62,7 +62,7 @@ AndExpr::AndExpr(Bexp *left, Bexp *right) {
     this->right = right;
 }
 
-bool AndExpr::eval(Store *store) {
+bool AndExpr::eval(Store& store) {
     return left->eval(store) && right->eval(store);
 }
 
@@ -77,7 +77,7 @@ OrExpr::OrExpr(Bexp *left, Bexp *right) {
     this->right = right;
 }
 
-bool OrExpr::eval(Store *store) {
+bool OrExpr::eval(Store& store) {
     return left->eval(store) || right->eval(store);
 }
 

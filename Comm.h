@@ -8,13 +8,13 @@
 
 class Comm {
     public:
-        virtual void eval(Store *store) = 0;
+        virtual void eval(Store& store) = 0;
         virtual ~Comm() = default;
 };
 
 class SkipComm: public Comm {
     public:
-        void eval(Store *store);
+        void eval(Store& store);
 };
 
 class AssignComm: public Comm {
@@ -24,7 +24,7 @@ class AssignComm: public Comm {
 
     public:
         AssignComm(string varName, Aexp *aexpr);
-        void eval(Store *store);
+        void eval(Store& store);
         ~AssignComm();
 };
 
@@ -35,7 +35,7 @@ class SeqComm: public Comm {
 
     public:
         SeqComm(Comm *left, Comm *right);
-        void eval(Store *store);
+        void eval(Store& store);
         ~SeqComm();
 };
 
@@ -47,7 +47,7 @@ class IfComm: public Comm {
 
     public:
         IfComm(Bexp *cond, Comm *trueComm, Comm *falseComm);
-        void eval(Store *store);
+        void eval(Store& store);
         ~IfComm();
 };
 
@@ -58,7 +58,7 @@ class WhileComm: public Comm {
 
     public:
         WhileComm(Bexp *cond, Comm *body);
-        void eval(Store *store);
+        void eval(Store& store);
         ~WhileComm();
 };
 

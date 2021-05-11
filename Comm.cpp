@@ -5,7 +5,7 @@
 #include "Store.h"
 
 // SkipComm
-void SkipComm::eval(Store *store) {
+void SkipComm::eval(Store& store) {
     return;
 }
 
@@ -15,8 +15,8 @@ AssignComm::AssignComm(string varName, Aexp *aexpr) {
     this->aexpr = aexpr;
 }
 
-void AssignComm::eval(Store *store) {
-    store->putVar(varName, aexpr->eval(store));
+void AssignComm::eval(Store& store) {
+    store.putVar(varName, aexpr->eval(store));
 }
 
 AssignComm::~AssignComm() {
@@ -29,7 +29,7 @@ SeqComm::SeqComm(Comm *left, Comm *right) {
     this->right = right;
 }
 
-void SeqComm::eval(Store *store) {
+void SeqComm::eval(Store& store) {
     left->eval(store);
     right->eval(store);
 }
@@ -46,7 +46,7 @@ IfComm::IfComm(Bexp *cond, Comm *trueComm, Comm *falseComm) {
     this->falseComm = falseComm;
 }
 
-void IfComm::eval(Store *store) {
+void IfComm::eval(Store& store) {
     if (cond->eval(store)) {
         trueComm->eval(store);
     }
@@ -67,7 +67,7 @@ WhileComm::WhileComm(Bexp *cond, Comm *body) {
     this->body = body;
 }
 
-void WhileComm::eval(Store *store) {
+void WhileComm::eval(Store& store) {
     while (cond->eval(store)) {
         body->eval(store);
     }
