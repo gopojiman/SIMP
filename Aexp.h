@@ -6,58 +6,58 @@
 
 class Aexp {
     public:
-        virtual int eval(Store& store) = 0;
+        virtual int eval(Store& store) const = 0;
         virtual ~Aexp() = default;
 };
 
 class NumExpr: public Aexp {
     private:
-        int val;
+        const int val;
 
     public:
-        NumExpr(int val);
-        int eval(Store& store);
+        NumExpr(int val):val(val) {};
+        int eval(Store& store) const;
 };
 
 class VarExpr: public Aexp {
     private:
-        string name;
+        const string name;
 
     public:
-        VarExpr(string name);
-        int eval(Store& store);
+        VarExpr(string name):name(name) {};
+        int eval(Store& store) const;
 };
 
 class AddExpr: public Aexp {
     private:
-        Aexp *left;
-        Aexp *right;
+        const Aexp *left;
+        const Aexp *right;
     
     public:
-        AddExpr(Aexp *left, Aexp *right);
-        int eval(Store& store);
+        AddExpr(Aexp *left, Aexp *right):left(left),right(right) {};
+        int eval(Store& store) const;
         ~AddExpr();
 };
 
 class SubExpr: public Aexp {
     private:
-        Aexp *left;
-        Aexp *right;
+        const Aexp *left;
+        const Aexp *right;
     
     public:
-        SubExpr(Aexp *left, Aexp *right);
-        int eval(Store& store);
+        SubExpr(Aexp *left, Aexp *right):left(left),right(right) {};
+        int eval(Store& store) const;
         ~SubExpr();
 };
 
 class MultExpr: public Aexp {
     private:
-        Aexp *left;
-        Aexp *right;
+        const Aexp *left;
+        const Aexp *right;
     
     public:
-        MultExpr(Aexp *left, Aexp *right);
-        int eval(Store& store);
+        MultExpr(Aexp *left, Aexp *right):left(left),right(right) {};
+        int eval(Store& store) const;
         ~MultExpr();
 };
 

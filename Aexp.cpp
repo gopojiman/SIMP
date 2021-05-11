@@ -3,30 +3,17 @@
 #include "Store.h"
 
 // NumExpr
-NumExpr::NumExpr(int val) {
-    this->val = val;
-}
-
-int NumExpr::eval(Store& store) {
+int NumExpr::eval(Store& store) const {
     return val;
 }
 
 // VarExpr
-VarExpr::VarExpr(string name) {
-    this->name = name;
-}
-
-int VarExpr::eval(Store& store) {
+int VarExpr::eval(Store& store) const {
     return store.getVar(name);
 }
 
 // AddExpr
-AddExpr::AddExpr(Aexp *left, Aexp *right) {
-    this->left = left;
-    this->right = right;
-}
-
-int AddExpr::eval(Store& store) {
+int AddExpr::eval(Store& store) const {
     return left->eval(store) + right->eval(store);
 }
 
@@ -36,12 +23,7 @@ AddExpr::~AddExpr() {
 }
 
 // SubExpr
-SubExpr::SubExpr(Aexp *left, Aexp *right) {
-    this->left = left;
-    this->right = right;
-}
-
-int SubExpr::eval(Store& store) {
+int SubExpr::eval(Store& store) const {
     return left->eval(store) - right->eval(store);
 }
 
@@ -51,12 +33,7 @@ SubExpr::~SubExpr() {
 }
 
 // MultExpr
-MultExpr::MultExpr(Aexp *left, Aexp *right) {
-    this->left = left;
-    this->right = right;
-}
-
-int MultExpr::eval(Store& store) {
+int MultExpr::eval(Store& store) const {
     return left->eval(store) * right->eval(store);
 }
 

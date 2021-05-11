@@ -1,6 +1,6 @@
 
 simp : *.h *.cpp
-	clang++ -std=c++14 *.cpp -o simp
+	clang++ -std=c++17 *.cpp -o simp
 
 clean :
 	- rm simp
