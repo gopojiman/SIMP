@@ -1,7 +1,6 @@
 #ifndef BEXP_H
 #define BEXP_H
 
-#include "Store.h"
 #include "Aexp.h"
 
 class Bexp {
@@ -22,24 +21,24 @@ class FalseExpr: public Bexp {
 
 class EqExpr: public Bexp {
     private:
-        Aexp *left;
-        Aexp *right;
+        unique_ptr<const Aexp> left;
+        unique_ptr<const Aexp> right;
 
     public:
-        EqExpr(Aexp *left, Aexp *right);
+        EqExpr(unique_ptr<const Aexp>& left, unique_ptr<const Aexp>& right):
+            left(move(left)),right(move(right)) {};
         bool eval(Store& store);
-        ~EqExpr();
 };
 
 class LessExpr: public Bexp {
     private:
-        Aexp *left;
-        Aexp *right;
+        unique_ptr<const Aexp> left;
+        unique_ptr<const Aexp> right;
 
     public:
-        LessExpr(Aexp *left, Aexp *right);
+        LessExpr(unique_ptr<const Aexp>& left, unique_ptr<const Aexp>& right):
+            left(move(left)),right(move(right)) {};
         bool eval(Store& store);
-        ~LessExpr();
 };
 
 class NotExpr: public Bexp {

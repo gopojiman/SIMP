@@ -1,7 +1,7 @@
 #ifndef AEXP_H
 #define AEXP_H
 
-#include <string>
+#include <memory>
 #include "Store.h"
 
 class Aexp {
@@ -30,35 +30,35 @@ class VarExpr: public Aexp {
 
 class AddExpr: public Aexp {
     private:
-        const Aexp *left;
-        const Aexp *right;
+        unique_ptr<const Aexp> left;
+        unique_ptr<const Aexp> right;
     
     public:
-        AddExpr(Aexp *left, Aexp *right):left(left),right(right) {};
+        AddExpr(unique_ptr<const Aexp>& left, unique_ptr<const Aexp>& right):
+            left(move(left)),right(move(right)) {};
         int eval(Store& store) const;
-        ~AddExpr();
 };
 
 class SubExpr: public Aexp {
     private:
-        const Aexp *left;
-        const Aexp *right;
+        unique_ptr<const Aexp> left;
+        unique_ptr<const Aexp> right;
     
     public:
-        SubExpr(Aexp *left, Aexp *right):left(left),right(right) {};
+        SubExpr(unique_ptr<const Aexp>& left, unique_ptr<const Aexp>& right):
+            left(move(left)),right(move(right)) {};
         int eval(Store& store) const;
-        ~SubExpr();
 };
 
 class MultExpr: public Aexp {
     private:
-        const Aexp *left;
-        const Aexp *right;
+        unique_ptr<const Aexp> left;
+        unique_ptr<const Aexp> right;
     
     public:
-        MultExpr(Aexp *left, Aexp *right):left(left),right(right) {};
+        MultExpr(unique_ptr<const Aexp>& left, unique_ptr<const Aexp>& right):
+            left(move(left)),right(move(right)) {};
         int eval(Store& store) const;
-        ~MultExpr();
 };
 
 #endif

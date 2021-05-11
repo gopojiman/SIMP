@@ -1,8 +1,4 @@
-#include <string>
-#include "Aexp.h"
-#include "Bexp.h"
 #include "Comm.h"
-#include "Store.h"
 
 // SkipComm
 void SkipComm::eval(Store& store) {
@@ -10,17 +6,8 @@ void SkipComm::eval(Store& store) {
 }
 
 // AssignComm
-AssignComm::AssignComm(string varName, Aexp *aexpr) {
-    this->varName = varName;
-    this->aexpr = aexpr;
-}
-
 void AssignComm::eval(Store& store) {
     store.putVar(varName, aexpr->eval(store));
-}
-
-AssignComm::~AssignComm() {
-    delete aexpr;
 }
 
 // SeqComm

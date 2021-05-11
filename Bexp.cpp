@@ -1,7 +1,4 @@
-#include <string>
-#include "Aexp.h"
 #include "Bexp.h"
-#include "Store.h"
 
 // TrueExpr
 bool TrueExpr::eval(Store& store) {
@@ -14,33 +11,13 @@ bool FalseExpr::eval(Store& store) {
 }
 
 // EqExpr
-EqExpr::EqExpr(Aexp *left, Aexp *right) {
-    this->left = left;
-    this->right = right;
-}
-
 bool EqExpr::eval(Store& store) {
     return left->eval(store) == right->eval(store);
 }
 
-EqExpr::~EqExpr() {
-    delete left;
-    delete right;
-}
-
 // LessExpr
-LessExpr::LessExpr(Aexp *left, Aexp *right) {
-    this->left = left;
-    this->right = right;
-}
-
 bool LessExpr::eval(Store& store) {
     return left->eval(store) < right->eval(store);
-}
-
-LessExpr::~LessExpr() {
-    delete left;
-    delete right;
 }
 
 // NotExpr

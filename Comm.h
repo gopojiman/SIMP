@@ -1,9 +1,6 @@
 #ifndef COMM_H
 #define COMM_H
 
-#include <string>
-#include "Store.h"
-#include "Aexp.h"
 #include "Bexp.h"
 
 class Comm {
@@ -19,13 +16,13 @@ class SkipComm: public Comm {
 
 class AssignComm: public Comm {
     private:
-        string varName;
-        Aexp *aexpr;
+        const string varName;
+        unique_ptr<const Aexp> aexpr;
 
     public:
-        AssignComm(string varName, Aexp *aexpr);
+        AssignComm(string varName, unique_ptr<const Aexp>& aexpr):
+            varName(varName),aexpr(move(aexpr)) {};
         void eval(Store& store);
-        ~AssignComm();
 };
 
 class SeqComm: public Comm {

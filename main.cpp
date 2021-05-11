@@ -1,10 +1,4 @@
-#include <iostream>
-#include <string>
-#include "Store.h"
-#include "Comm.h"
 #include "Parser.h"
-using namespace std;
-
 
 int main() {
     Store store;

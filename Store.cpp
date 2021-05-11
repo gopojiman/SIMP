@@ -1,7 +1,4 @@
-#include <iostream>
-#include <string>
 #include "Store.h"
-using namespace std;
 
 void Store::putVar(const string& key, int val) {
     varMap[key] = val;
