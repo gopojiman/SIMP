@@ -10,6 +10,8 @@ class Aexp {
         virtual ~Aexp() = default;
 };
 
+typedef unique_ptr<const Aexp> AexpP;
+
 class NumExpr: public Aexp {
     private:
         const int val;
@@ -30,33 +32,33 @@ class VarExpr: public Aexp {
 
 class AddExpr: public Aexp {
     private:
-        unique_ptr<const Aexp> left;
-        unique_ptr<const Aexp> right;
+        AexpP left;
+        AexpP right;
     
     public:
-        AddExpr(unique_ptr<const Aexp>& left, unique_ptr<const Aexp>& right):
+        AddExpr(AexpP& left, AexpP& right):
             left(move(left)),right(move(right)) {};
         int eval(Store& store) const;
 };
 
 class SubExpr: public Aexp {
     private:
-        unique_ptr<const Aexp> left;
-        unique_ptr<const Aexp> right;
+        AexpP left;
+        AexpP right;
     
     public:
-        SubExpr(unique_ptr<const Aexp>& left, unique_ptr<const Aexp>& right):
+        SubExpr(AexpP& left, AexpP& right):
             left(move(left)),right(move(right)) {};
         int eval(Store& store) const;
 };
 
 class MultExpr: public Aexp {
     private:
-        unique_ptr<const Aexp> left;
-        unique_ptr<const Aexp> right;
+        AexpP left;
+        AexpP right;
     
     public:
-        MultExpr(unique_ptr<const Aexp>& left, unique_ptr<const Aexp>& right):
+        MultExpr(AexpP& left, AexpP& right):
             left(move(left)),right(move(right)) {};
         int eval(Store& store) const;
 };

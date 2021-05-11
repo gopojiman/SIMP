@@ -17,10 +17,10 @@ class SkipComm: public Comm {
 class AssignComm: public Comm {
     private:
         const string varName;
-        unique_ptr<const Aexp> aexpr;
+        AexpP aexpr;
 
     public:
-        AssignComm(string varName, unique_ptr<const Aexp>& aexpr):
+        AssignComm(string varName, AexpP& aexpr):
             varName(varName),aexpr(move(aexpr)) {};
         void eval(Store& store);
 };

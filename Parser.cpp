@@ -63,30 +63,30 @@ int Parser::skipToMatchingElse(int i, int end) {
     exit(1);
 }
 
-unique_ptr<const Aexp> Parser::parseAexp(int start, int end) {
+AexpP Parser::parseAexp(int start, int end) {
     if (start == end) {
         string token = tokens[start];
         if (!token.empty() && 
             ((token.at(0) == '-' && token.find_first_not_of("1234567890", 1) == string::npos) ||
             (token.find_first_not_of("1234567890") == string::npos))) {
-                return unique_ptr<const Aexp>(new NumExpr(stoi(token)));
+                return AexpP(new NumExpr(stoi(token)));
             }
         else {
-            return unique_ptr<const Aexp>(new VarExpr(token));
+            return AexpP(new VarExpr(token));
         }
     }
 
     int i = end;
     while (i >= start) {
         if (tokens[i] == "+") {
-            auto left = parseAexp(start, i - 1);
-            auto right = parseAexp(i + 1, end);
-            return unique_ptr<const Aexp>(new AddExpr(left, right));
+            AexpP left = parseAexp(start, i - 1);
+            AexpP right = parseAexp(i + 1, end);
+            return AexpP(new AddExpr(left, right));
         }
         if (tokens[i] == "-") {
-            auto left = parseAexp(start, i - 1);
-            auto right = parseAexp(i + 1, end);
-            return unique_ptr<const Aexp>(new SubExpr(left, right));
+            AexpP left = parseAexp(start, i - 1);
+            AexpP right = parseAexp(i + 1, end);
+            return AexpP(new SubExpr(left, right));
         }
         if (tokens[i] == ")") {
             int nextParen = skipToMatchingParen(i, start);
@@ -101,9 +101,9 @@ unique_ptr<const Aexp> Parser::parseAexp(int start, int end) {
     i = end;
     while (i >= start) {
         if (tokens[i] == "*") {
-            auto left = parseAexp(start, i - 1);
-            auto right = parseAexp(i + 1, end);
-            return unique_ptr<const Aexp>(new MultExpr(left, right));
+            AexpP left = parseAexp(start, i - 1);
+            AexpP right = parseAexp(i + 1, end);
+            return AexpP(new MultExpr(left, right));
         }
         if (tokens[i] == ")") {
             int nextParen = skipToMatchingParen(i, start);
@@ -159,13 +159,13 @@ Bexp *Parser::parseBexp(int start, int end) {
     i = end;
     while (i >= start) {
         if (tokens[i] == "==") {
-            auto left = parseAexp(start, i - 1);
-            auto right = parseAexp(i + 1, end);
+            AexpP left = parseAexp(start, i - 1);
+            AexpP right = parseAexp(i + 1, end);
             return new EqExpr(left, right);
         }
         if (tokens[i] == "<") {
-            auto left = parseAexp(start, i - 1);
-            auto right = parseAexp(i + 1, end);
+            AexpP left = parseAexp(start, i - 1);
+            AexpP right = parseAexp(i + 1, end);
             return new LessExpr(left, right);
         }
         i--;
@@ -224,7 +224,7 @@ Comm *Parser::parseComm(int start, int end) {
     }
 
     if (end - start > 1 && tokens[start + 1] == "=") {
-        auto aexpr = parseAexp(start + 2, end);
+        AexpP aexpr = parseAexp(start + 2, end);
         return new AssignComm(tokens[start], aexpr);
     }
 

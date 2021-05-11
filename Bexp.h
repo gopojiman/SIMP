@@ -21,22 +21,22 @@ class FalseExpr: public Bexp {
 
 class EqExpr: public Bexp {
     private:
-        unique_ptr<const Aexp> left;
-        unique_ptr<const Aexp> right;
+        AexpP left;
+        AexpP right;
 
     public:
-        EqExpr(unique_ptr<const Aexp>& left, unique_ptr<const Aexp>& right):
+        EqExpr(AexpP& left, AexpP& right):
             left(move(left)),right(move(right)) {};
         bool eval(Store& store);
 };
 
 class LessExpr: public Bexp {
     private:
-        unique_ptr<const Aexp> left;
-        unique_ptr<const Aexp> right;
+        AexpP left;
+        AexpP right;
 
     public:
-        LessExpr(unique_ptr<const Aexp>& left, unique_ptr<const Aexp>& right):
+        LessExpr(AexpP& left, AexpP& right):
             left(move(left)),right(move(right)) {};
         bool eval(Store& store);
 };

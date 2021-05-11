@@ -10,7 +10,7 @@ class Parser {
         int skipToMatchingParen(int i, int start);
         int skipToMatchingBracket(int i, int start);
         int skipToMatchingElse(int i, int end);
-        unique_ptr<const Aexp> parseAexp(int start, int end);
+        AexpP parseAexp(int start, int end);
         Bexp *parseBexp(int start, int end);
         Comm *parseComm(int start, int end);
 
