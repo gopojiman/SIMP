@@ -20,11 +20,11 @@ class SkipComm: public Comm {
 class AssignComm: public Comm {
     private:
         const string varName;
-        AexpP aexpr;
+        AexpP aexp;
 
     public:
-        AssignComm(string varName, AexpP& aexpr):
-            varName(varName),aexpr(move(aexpr)) {};
+        AssignComm(string varName, AexpP& aexp):
+            varName(varName),aexp(move(aexp)) {};
         void eval(Store& store) const;
 };
 

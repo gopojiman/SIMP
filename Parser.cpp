@@ -64,6 +64,7 @@ int Parser::skipToMatchingElse(int i, int end) {
 }
 
 AexpP Parser::parseAexp(int start, int end) {
+    // Num or Var
     if (start == end) {
         string token = tokens[start];
         if (!token.empty() && 
@@ -76,6 +77,7 @@ AexpP Parser::parseAexp(int start, int end) {
         }
     }
 
+    // Binary Aexps with low precedence
     int i = end;
     while (i >= start) {
         string token = tokens[i];
@@ -94,14 +96,16 @@ AexpP Parser::parseAexp(int start, int end) {
         i--;
     }
 
+    // Binary Aexps with high precedence
     i = end;
     while (i >= start) {
-        if (tokens[i] == "*") {
+        string token = tokens[i];
+        if (token == "*") {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
-            return AexpP(new BinaryAexp(Aexp::binaryFuncs["*"], left, right));
+            return AexpP(new BinaryAexp(Aexp::binaryFuncs[token], left, right));
         }
-        if (tokens[i] == ")") {
+        if (token == ")") {
             int nextParen = skipToMatchingParen(i, start);
             if (i == end && nextParen == start) {
                 return parseAexp(start + 1, end - 1);
@@ -116,29 +120,28 @@ AexpP Parser::parseAexp(int start, int end) {
 }
 
 BexpP Parser::parseBexp(int start, int end) {
+    // Literal Bexp
     if (start == end) {
         string token = tokens[start];
         if (token == "true") {
-            return BexpP(new TrueExpr());
+            return BexpP(new LiteralBexp(true));
         }
         else if (token == "false") {
-            return BexpP(new FalseExpr());
+            return BexpP(new LiteralBexp(false));
         }
     }
 
+    // Logical Bexp
     int i = end;
     while (i >= start) {
-        if (tokens[i] == "&&") {
+        string token = tokens[i];
+        auto it = Bexp::logFuncs.find(token);
+        if (it != Bexp::logFuncs.end()) {
             BexpP left = parseBexp(start, i - 1);
             BexpP right = parseBexp(i + 1, end);
-            return BexpP(new AndExpr(left, right));
+            return BexpP(new LogicalBexp(it->second, left, right));
         }
-        if (tokens[i] == "||") {
-            BexpP left = parseBexp(start, i - 1);
-            BexpP right = parseBexp(i + 1, end);
-            return BexpP(new OrExpr(left, right));
-        }
-        if (tokens[i] == ")") {
+        if (token == ")") {
             int nextParen = skipToMatchingParen(i, start);
             if (i == end && nextParen == start) {
                 return parseBexp(start + 1, end - 1);
@@ -148,22 +151,21 @@ BexpP Parser::parseBexp(int start, int end) {
         i--;
     }
 
+    // Not Bexp
     if (start < end && tokens[start] == "!") {
         BexpP oper = parseBexp(start + 1, end);
-        return BexpP(new NotExpr(oper));
+        return BexpP(new NotBexp(oper));
     }
 
+    // Compare Bexp
     i = end;
     while (i >= start) {
-        if (tokens[i] == "==") {
+        string token = tokens[i];
+        auto it = Bexp::compFuncs.find(token);
+        if (it != Bexp::compFuncs.end()) {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
-            return BexpP(new EqExpr(left, right));
-        }
-        if (tokens[i] == "<") {
-            AexpP left = parseAexp(start, i - 1);
-            AexpP right = parseAexp(i + 1, end);
-            return BexpP(new LessExpr(left, right));
+            return BexpP(new CompareBexp(it->second, left, right));
         }
         i--;
     }

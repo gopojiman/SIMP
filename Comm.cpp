@@ -5,7 +5,7 @@ void SkipComm::eval(Store& store) const {
 }
 
 void AssignComm::eval(Store& store) const {
-    store.putVar(varName, aexpr->eval(store));
+    store.putVar(varName, aexp->eval(store));
 }
 
 void SeqComm::eval(Store& store) const {

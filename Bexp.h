@@ -3,8 +3,15 @@
 
 #include "Aexp.h"
 
+// Alias for Comparison Bexp Function
+typedef function<bool(int, int)> CompBexpFunc;
+// Alias for Logical Bexp Function
+typedef function<bool(bool, bool)> LogBexpFunc;
+
 class Bexp {
     public:
+        static map<string, CompBexpFunc> compFuncs; // mapping from comparison operators to functions
+        static map<string, LogBexpFunc> logFuncs; // mapping from logical operators to functions
         virtual bool eval(Store& store) const = 0;
         virtual ~Bexp() = default;
 };
@@ -12,66 +19,45 @@ class Bexp {
 // Alias for Bexp smart pointer
 typedef unique_ptr<const Bexp> BexpP;
 
-class TrueExpr: public Bexp {
-    public:
-        bool eval(Store& store) const;
-};
-
-class FalseExpr: public Bexp {
-    public:
-        bool eval(Store& store) const;
-};
-
-class EqExpr: public Bexp {
+class LiteralBexp: public Bexp {
     private:
+        bool val;
+
+    public:
+        LiteralBexp(bool val):val(val) {};
+        bool eval(Store& store) const;
+};
+
+class CompareBexp: public Bexp {
+    private:
+        CompBexpFunc func;
         AexpP left;
         AexpP right;
-
+    
     public:
-        EqExpr(AexpP& left, AexpP& right):
-            left(move(left)),right(move(right)) {};
+        CompareBexp(CompBexpFunc& func, AexpP& left, AexpP& right):
+            func(func),left(move(left)),right(move(right)) {};
         bool eval(Store& store) const;
 };
 
-class LessExpr: public Bexp {
-    private:
-        AexpP left;
-        AexpP right;
-
-    public:
-        LessExpr(AexpP& left, AexpP& right):
-            left(move(left)),right(move(right)) {};
-        bool eval(Store& store) const;
-};
-
-class NotExpr: public Bexp {
+class NotBexp: public Bexp {
     private:
         BexpP oper;
 
     public:
-        NotExpr(BexpP& oper):oper(move(oper)) {};
+        NotBexp(BexpP& oper):oper(move(oper)) {};
         bool eval(Store& store) const;
 };
 
-class AndExpr: public Bexp {
+class LogicalBexp: public Bexp {
     private:
+        LogBexpFunc func;
         BexpP left;
         BexpP right;
 
     public:
-        AndExpr(BexpP& left, BexpP& right):
-            left(move(left)),right(move(right)) {};
-        bool eval(Store& store) const;
-};
-
-class OrExpr: public Bexp {
-    private:
-        BexpP left;
-        BexpP right;
-
-    public:
-        OrExpr(BexpP& left, BexpP& right):
-            left(move(left)),right(move(right)) {};
+        LogicalBexp(LogBexpFunc& func, BexpP& left, BexpP& right):
+            func(func),left(move(left)),right(move(right)) {};
         bool eval(Store& store) const;
 };
 

@@ -1,29 +1,32 @@
 #include "Bexp.h"
 
-bool TrueExpr::eval(Store& store) const {
-    return true;
+map<string, CompBexpFunc> Bexp::compFuncs = {
+    {"==", equal_to<int>()},
+    {"!=", not_equal_to<int>()},
+    {">",  greater<int>()},
+    {"<",  less<int>()},
+    {">=", greater_equal<int>()},
+    {"<=", less_equal<int>()}
+};
+
+map<string, LogBexpFunc> Bexp::logFuncs = {
+    {"&&", logical_and<bool>()},
+    {"||", logical_or<bool>()},
+    {"^^", [](bool b1, bool b2){return (b1 && !b2) || (!b1 && b2);}} // xor
+};
+
+bool LiteralBexp::eval(Store& store) const {
+    return val;
 }
 
-bool FalseExpr::eval(Store& store) const {
-    return false;
+bool CompareBexp::eval(Store& store) const {
+    return func(left->eval(store), right->eval(store));
 }
 
-bool EqExpr::eval(Store& store) const {
-    return left->eval(store) == right->eval(store);
-}
-
-bool LessExpr::eval(Store& store) const {
-    return left->eval(store) < right->eval(store);
-}
-
-bool NotExpr::eval(Store& store) const {
+bool NotBexp::eval(Store& store) const {
     return !(oper->eval(store));
 }
 
-bool AndExpr::eval(Store& store) const {
-    return left->eval(store) && right->eval(store);
-}
-
-bool OrExpr::eval(Store& store) const {
-    return left->eval(store) || right->eval(store);
+bool LogicalBexp::eval(Store& store) const {
+    return func(left->eval(store), right->eval(store));
 }

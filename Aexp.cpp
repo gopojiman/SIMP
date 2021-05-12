@@ -1,9 +1,9 @@
 #include "Aexp.h"
 
 map<string, BinAexpFunc> Aexp::binaryFuncs = {
-            {"+", plus<int>()},
-            {"-", minus<int>()},
-            {"*", multiplies<int>()}
+    {"+", plus<int>()},
+    {"-", minus<int>()},
+    {"*", multiplies<int>()}
 };
 
 int Num::eval(Store& store) const {
