@@ -15,15 +15,13 @@ Parser::Parser(const string& str) {
 // given a closing parenthese at position i, iterates
 // backwards to find the matching opening parenthese
 int Parser::skipToMatchingParen(int i, int start) {
-    int j = i - 1;
-    while (j >= start) {
+    for (int j = i - 1; j >= start; j--) {
         if (tokens[j] == "(") {
             return j;
         }
         if (tokens[j] == ")") {
             j = skipToMatchingParen(j, start);
         }
-        j--;
     }
     cerr << "Error: Matching Parenthese Not Found" << endl;
     exit(1);
@@ -32,15 +30,13 @@ int Parser::skipToMatchingParen(int i, int start) {
 // given a closing bracket at position i, iterates
 // backwards to find the matching opening bracket
 int Parser::skipToMatchingBracket(int i, int start) {
-    int j = i - 1;
-    while (j >= start) {
+    for (int j = i - 1; j >= start; j--) {
         if (tokens[j] == "{") {
             return j;
         }
         if (tokens[j] == "}") {
             j = skipToMatchingBracket(j, start);
         }
-        j--;
     }
     cerr << "Error: Matching Bracket Not Found" << endl;
     exit(1);
@@ -49,15 +45,13 @@ int Parser::skipToMatchingBracket(int i, int start) {
 // given a "then" at position i, iterates
 // forwards to find the matching "else"
 int Parser::skipToMatchingElse(int i, int end) {
-    int j = i + 2;
-    while (j <= end) {
+    for (int j = i + 2; j <= end; j++) {
         if (tokens[j] == "else") {
             return j;
         }
         if (tokens[j] == "then") {
             j = skipToMatchingElse(j, end);
         }
-        j++;
     }
     cerr << "Error: Matching Else Not Found" << endl;
     exit(1);
@@ -78,8 +72,7 @@ AexpP Parser::parseAexp(int start, int end) {
     }
 
     // Binary Aexps with low precedence
-    int i = end;
-    while (i >= start) {
+    for (int i = end; i >= start; i--) {
         string token = tokens[i];
         auto it = Aexp::binaryFuncs0.find(token);
         if (it != Aexp::binaryFuncs0.end()) {
@@ -94,12 +87,10 @@ AexpP Parser::parseAexp(int start, int end) {
             }
             i = nextParen;
         }
-        i--;
     }
 
     // Binary Aexps with high precedence
-    i = end;
-    while (i >= start) {
+    for (int i = end; i >= start; i--) {
         string token = tokens[i];
         auto it = Aexp::binaryFuncs1.find(token);
         if (it != Aexp::binaryFuncs1.end()) {
@@ -114,7 +105,6 @@ AexpP Parser::parseAexp(int start, int end) {
             }
             i = nextParen;
         }
-        i--;
     }
 
     cerr << "Error: Unable to parse Aexp" << endl;
@@ -134,8 +124,7 @@ BexpP Parser::parseBexp(int start, int end) {
     }
 
     // Logical Bexp
-    int i = end;
-    while (i >= start) {
+    for (int i = end; i >= start; i--) {
         string token = tokens[i];
         auto it = Bexp::logFuncs.find(token);
         if (it != Bexp::logFuncs.end()) {
@@ -150,7 +139,6 @@ BexpP Parser::parseBexp(int start, int end) {
             }
             i = nextParen;
         }
-        i--;
     }
 
     // Not Bexp
@@ -160,8 +148,7 @@ BexpP Parser::parseBexp(int start, int end) {
     }
 
     // Compare Bexp
-    i = end;
-    while (i >= start) {
+    for (int i = end; i >= start; i--) {
         string token = tokens[i];
         auto it = Bexp::compFuncs.find(token);
         if (it != Bexp::compFuncs.end()) {
@@ -169,7 +156,6 @@ BexpP Parser::parseBexp(int start, int end) {
             AexpP right = parseAexp(i + 1, end);
             return BexpP(new CompareBexp(it->second, left, right));
         }
-        i--;
     }
 
     cerr << "Error: Unable to parse Bexp" << endl;
@@ -185,8 +171,7 @@ CommP Parser::parseComm(int start, int end) {
         return CommP(new SkipComm());
     }
 
-    int i = end;
-    while (i >= start) {
+    for (int i = end; i >= start; i--) {
         if (tokens[i] == ";") {
             CommP left = parseComm(start, i - 1);
             CommP right = parseComm(i + 1, end);
@@ -199,11 +184,10 @@ CommP Parser::parseComm(int start, int end) {
             }
             i = nextBrack;
         }
-        i--;
     }
 
     if (end - start > 4 && tokens[start] == "if") {
-        for (i = start + 2; i < end - 2; i++) {
+        for (int i = start + 2; i < end - 2; i++) {
             if (tokens[i] == "then") {
                 int nextElse = skipToMatchingElse(i, end);
                 BexpP cond = parseBexp(start + 1, i - 1);
@@ -215,7 +199,7 @@ CommP Parser::parseComm(int start, int end) {
     }
 
     if (end - start > 2 && tokens[start] == "while") {
-        for (i = start + 2; i < end; i++) {
+        for (int i = start + 2; i < end; i++) {
             if (tokens[i] == "do") {
                 BexpP cond = parseBexp(start + 1, i - 1);
                 CommP body = parseComm(i + 1, end);
