@@ -78,17 +78,13 @@ AexpP Parser::parseAexp(int start, int end) {
 
     int i = end;
     while (i >= start) {
-        if (tokens[i] == "+") {
+        string token = tokens[i];
+        if (token == "+" || token == "-") {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
-            return AexpP(new BinaryAexp(Aexp::binaryFuncs["+"], left, right));
+            return AexpP(new BinaryAexp(Aexp::binaryFuncs[token], left, right));
         }
-        if (tokens[i] == "-") {
-            AexpP left = parseAexp(start, i - 1);
-            AexpP right = parseAexp(i + 1, end);
-            return AexpP(new BinaryAexp(Aexp::binaryFuncs["-"], left, right));
-        }
-        if (tokens[i] == ")") {
+        if (token == ")") {
             int nextParen = skipToMatchingParen(i, start);
             if (i == end && nextParen == start) {
                 return parseAexp(start + 1, end - 1);
