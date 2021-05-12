@@ -5,13 +5,16 @@
 
 class Comm {
     public:
-        virtual void eval(Store& store) = 0;
+        virtual void eval(Store& store) const = 0;
         virtual ~Comm() = default;
 };
 
+// Alias for Comm smart pointer
+typedef unique_ptr<const Comm> CommP;
+
 class SkipComm: public Comm {
     public:
-        void eval(Store& store);
+        void eval(Store& store) const;
 };
 
 class AssignComm: public Comm {
@@ -22,43 +25,43 @@ class AssignComm: public Comm {
     public:
         AssignComm(string varName, AexpP& aexpr):
             varName(varName),aexpr(move(aexpr)) {};
-        void eval(Store& store);
+        void eval(Store& store) const;
 };
 
 class SeqComm: public Comm {
     private:
-        Comm *left;
-        Comm *right;
+        CommP left;
+        CommP right;
 
     public:
-        SeqComm(Comm *left, Comm *right);
-        void eval(Store& store);
-        ~SeqComm();
+        SeqComm(CommP& left, CommP& right):
+            left(move(left)),right(move(right)) {};
+        void eval(Store& store) const;
 };
 
 class IfComm: public Comm {
     private:
         BexpP cond;
-        Comm *trueComm;
-        Comm *falseComm;
+        CommP trueComm;
+        CommP falseComm;
 
     public:
-        IfComm(BexpP& cond, Comm *trueComm, Comm *falseComm):
-            cond(move(cond)),trueComm(trueComm),falseComm(falseComm) {};
-        void eval(Store& store);
-        ~IfComm();
+        IfComm(BexpP& cond, CommP& trueComm, CommP& falseComm):
+            cond(move(cond)),
+            trueComm(move(trueComm)),
+            falseComm(move(falseComm)) {};
+        void eval(Store& store) const;
 };
 
 class WhileComm: public Comm {
     private:
         BexpP cond;
-        Comm *body;
+        CommP body;
 
     public:
-        WhileComm(BexpP& cond, Comm *body):
-            cond(move(cond)),body(body) {};
-        void eval(Store& store);
-        ~WhileComm();
+        WhileComm(BexpP& cond, CommP& body):
+            cond(move(cond)),body(move(body)) {};
+        void eval(Store& store) const;
 };
 
 #endif

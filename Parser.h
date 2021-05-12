@@ -12,11 +12,11 @@ class Parser {
         int skipToMatchingElse(int i, int end);
         AexpP parseAexp(int start, int end);
         BexpP parseBexp(int start, int end);
-        Comm *parseComm(int start, int end);
+        CommP parseComm(int start, int end);
 
     public:
         Parser(const string& str);
-        Comm *parseComm(); // allocates a new Comm, must call delete after
+        CommP parseComm();
 };
 
 #endif

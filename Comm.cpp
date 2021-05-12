@@ -1,33 +1,19 @@
 #include "Comm.h"
 
-// SkipComm
-void SkipComm::eval(Store& store) {
+void SkipComm::eval(Store& store) const {
     return;
 }
 
-// AssignComm
-void AssignComm::eval(Store& store) {
+void AssignComm::eval(Store& store) const {
     store.putVar(varName, aexpr->eval(store));
 }
 
-// SeqComm
-SeqComm::SeqComm(Comm *left, Comm *right) {
-    this->left = left;
-    this->right = right;
-}
-
-void SeqComm::eval(Store& store) {
+void SeqComm::eval(Store& store) const {
     left->eval(store);
     right->eval(store);
 }
 
-SeqComm::~SeqComm() {
-    delete left;
-    delete right;
-}
-
-// IfComm
-void IfComm::eval(Store& store) {
+void IfComm::eval(Store& store) const {
     if (cond->eval(store)) {
         trueComm->eval(store);
     }
@@ -36,18 +22,8 @@ void IfComm::eval(Store& store) {
     }
 }
 
-IfComm::~IfComm() {
-    delete trueComm;
-    delete falseComm;
-}
-
-// WhileComm
-void WhileComm::eval(Store& store) {
+void WhileComm::eval(Store& store) const {
     while (cond->eval(store)) {
         body->eval(store);
     }
-}
-
-WhileComm::~WhileComm() {
-    delete body;
 }

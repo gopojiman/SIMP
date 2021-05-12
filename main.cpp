@@ -6,9 +6,8 @@ int main() {
     getline(cin, inputStr);
 
     Parser parser = Parser(inputStr);
-    Comm* comm = parser.parseComm();
+    CommP comm = parser.parseComm();
 
     comm->eval(store);
     cout << store << endl;
-    delete comm;
 }

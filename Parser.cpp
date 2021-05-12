@@ -46,7 +46,7 @@ int Parser::skipToMatchingBracket(int i, int start) {
     exit(1);
 }
 
-// given a closing "then" at position i, iterates
+// given a "then" at position i, iterates
 // forwards to find the matching "else"
 int Parser::skipToMatchingElse(int i, int end) {
     int j = i + 2;
@@ -176,21 +176,21 @@ BexpP Parser::parseBexp(int start, int end) {
     exit(1);
 }
 
-Comm *Parser::parseComm() {
+CommP Parser::parseComm() {
     return parseComm(0, tokens.size() - 1);
 }
 
-Comm *Parser::parseComm(int start, int end) {
+CommP Parser::parseComm(int start, int end) {
     if (start == end && tokens[start] == "skip") {
-        return new SkipComm();
+        return CommP(new SkipComm());
     }
 
     int i = end;
     while (i >= start) {
         if (tokens[i] == ";") {
-            Comm *left = parseComm(start, i - 1);
-            Comm *right = parseComm(i + 1, end);
-            return new SeqComm(left, right);
+            CommP left = parseComm(start, i - 1);
+            CommP right = parseComm(i + 1, end);
+            return CommP(new SeqComm(left, right));
         }
         if (tokens[i] == "}") {
             int nextBrack = skipToMatchingBracket(i, start);
@@ -207,9 +207,9 @@ Comm *Parser::parseComm(int start, int end) {
             if (tokens[i] == "then") {
                 int nextElse = skipToMatchingElse(i, end);
                 BexpP cond = parseBexp(start + 1, i - 1);
-                Comm *trueComm = parseComm(i + 1, nextElse - 1);
-                Comm *falseComm = parseComm(nextElse + 1, end);
-                return new IfComm(cond, trueComm, falseComm);
+                CommP trueComm = parseComm(i + 1, nextElse - 1);
+                CommP falseComm = parseComm(nextElse + 1, end);
+                return CommP(new IfComm(cond, trueComm, falseComm));
             }
         }
     }
@@ -218,15 +218,15 @@ Comm *Parser::parseComm(int start, int end) {
         for (i = start + 2; i < end; i++) {
             if (tokens[i] == "do") {
                 BexpP cond = parseBexp(start + 1, i - 1);
-                Comm *body = parseComm(i + 1, end);
-                return new WhileComm(cond, body);
+                CommP body = parseComm(i + 1, end);
+                return CommP(new WhileComm(cond, body));
             }
         }
     }
 
     if (end - start > 1 && tokens[start + 1] == "=") {
         AexpP aexpr = parseAexp(start + 2, end);
-        return new AssignComm(tokens[start], aexpr);
+        return CommP(new AssignComm(tokens[start], aexpr));
     }
 
     cerr << "Error: Unable to parse Comm" << endl;
