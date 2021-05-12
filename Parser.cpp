@@ -69,10 +69,10 @@ AexpP Parser::parseAexp(int start, int end) {
         if (!token.empty() && 
             ((token.at(0) == '-' && token.find_first_not_of("1234567890", 1) == string::npos) ||
             (token.find_first_not_of("1234567890") == string::npos))) {
-                return AexpP(new NumExpr(stoi(token)));
+                return AexpP(new Num(stoi(token)));
             }
         else {
-            return AexpP(new VarExpr(token));
+            return AexpP(new Var(token));
         }
     }
 
@@ -81,12 +81,12 @@ AexpP Parser::parseAexp(int start, int end) {
         if (tokens[i] == "+") {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
-            return AexpP(new AddExpr(left, right));
+            return AexpP(new BinaryAexp(Aexp::binaryFuncs["+"], left, right));
         }
         if (tokens[i] == "-") {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
-            return AexpP(new SubExpr(left, right));
+            return AexpP(new BinaryAexp(Aexp::binaryFuncs["-"], left, right));
         }
         if (tokens[i] == ")") {
             int nextParen = skipToMatchingParen(i, start);
@@ -103,7 +103,7 @@ AexpP Parser::parseAexp(int start, int end) {
         if (tokens[i] == "*") {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
-            return AexpP(new MultExpr(left, right));
+            return AexpP(new BinaryAexp(Aexp::binaryFuncs["*"], left, right));
         }
         if (tokens[i] == ")") {
             int nextParen = skipToMatchingParen(i, start);

@@ -2,10 +2,19 @@
 #define AEXP_H
 
 #include <memory>
+#include <functional>
 #include "Store.h"
+
+// Alias for Binary Aexp Function
+typedef function<int(int, int)> BinAexpFunc;
 
 class Aexp {
     public:
+        inline static map<string, BinAexpFunc> binaryFuncs = {
+            {"+", plus<int>()},
+            {"-", minus<int>()},
+            {"*", multiplies<int>()}
+        };
         virtual int eval(Store& store) const = 0;
         virtual ~Aexp() = default;
 };
@@ -13,55 +22,40 @@ class Aexp {
 // Alias for Aexp smart pointer
 typedef unique_ptr<const Aexp> AexpP;
 
-class NumExpr: public Aexp {
+class Num: public Aexp {
     private:
         const int val;
 
     public:
-        NumExpr(int val):val(val) {};
-        int eval(Store& store) const;
+        Num(int val):val(val) {};
+        int eval(Store& store) const {
+            return val;
+        }
 };
 
-class VarExpr: public Aexp {
+class Var: public Aexp {
     private:
         const string name;
 
     public:
-        VarExpr(string name):name(name) {};
-        int eval(Store& store) const;
+        Var(string name):name(name) {};
+        int eval(Store& store) const {
+            return store.getVar(name);
+        }
 };
 
-class AddExpr: public Aexp {
+class BinaryAexp: public Aexp {
     private:
+        BinAexpFunc func;
         AexpP left;
         AexpP right;
     
     public:
-        AddExpr(AexpP& left, AexpP& right):
-            left(move(left)),right(move(right)) {};
-        int eval(Store& store) const;
-};
-
-class SubExpr: public Aexp {
-    private:
-        AexpP left;
-        AexpP right;
-    
-    public:
-        SubExpr(AexpP& left, AexpP& right):
-            left(move(left)),right(move(right)) {};
-        int eval(Store& store) const;
-};
-
-class MultExpr: public Aexp {
-    private:
-        AexpP left;
-        AexpP right;
-    
-    public:
-        MultExpr(AexpP& left, AexpP& right):
-            left(move(left)),right(move(right)) {};
-        int eval(Store& store) const;
+        BinaryAexp(BinAexpFunc& func, AexpP& left, AexpP& right):
+            func(func),left(move(left)),right(move(right)) {};
+        int eval(Store& store) const {
+            return func(left->eval(store), right->eval(store));
+        }
 };
 
 #endif
