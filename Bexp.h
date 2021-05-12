@@ -10,8 +10,10 @@ typedef function<bool(bool, bool)> LogBexpFunc;
 
 class Bexp {
     public:
-        static map<string, CompBexpFunc> compFuncs; // mapping from comparison operators to functions
-        static map<string, LogBexpFunc> logFuncs; // mapping from logical operators to functions
+        // mapping from comparison operators to functions
+        static map<string, CompBexpFunc> compFuncs;
+        // mapping from logical operators to functions
+        static map<string, LogBexpFunc> logFuncs;
         virtual bool eval(Store& store) const = 0;
         virtual ~Bexp() = default;
 };

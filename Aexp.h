@@ -10,7 +10,10 @@ typedef function<int(int, int)> BinAexpFunc;
 
 class Aexp {
     public:
-        static map<string, BinAexpFunc> binaryFuncs; // mapping from binary operators to functions
+        // mapping from lowest precedence binary operators to functions
+        static map<string, BinAexpFunc> binaryFuncs0;
+        // mapping from highest precedence binary operators to functions
+        static map<string, BinAexpFunc> binaryFuncs1;
         virtual int eval(Store& store) const = 0;
         virtual ~Aexp() = default;
 };

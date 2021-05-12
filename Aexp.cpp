@@ -1,8 +1,11 @@
 #include "Aexp.h"
 
-map<string, BinAexpFunc> Aexp::binaryFuncs = {
+map<string, BinAexpFunc> Aexp::binaryFuncs0 = {
     {"+", plus<int>()},
-    {"-", minus<int>()},
+    {"-", minus<int>()}
+};
+
+map<string, BinAexpFunc> Aexp::binaryFuncs1 = {
     {"*", multiplies<int>()}
 };
 

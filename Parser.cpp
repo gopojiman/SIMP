@@ -81,10 +81,11 @@ AexpP Parser::parseAexp(int start, int end) {
     int i = end;
     while (i >= start) {
         string token = tokens[i];
-        if (token == "+" || token == "-") {
+        auto it = Aexp::binaryFuncs0.find(token);
+        if (it != Aexp::binaryFuncs0.end()) {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
-            return AexpP(new BinaryAexp(Aexp::binaryFuncs[token], left, right));
+            return AexpP(new BinaryAexp(it->second, left, right));
         }
         if (token == ")") {
             int nextParen = skipToMatchingParen(i, start);
@@ -100,10 +101,11 @@ AexpP Parser::parseAexp(int start, int end) {
     i = end;
     while (i >= start) {
         string token = tokens[i];
-        if (token == "*") {
+        auto it = Aexp::binaryFuncs1.find(token);
+        if (it != Aexp::binaryFuncs1.end()) {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
-            return AexpP(new BinaryAexp(Aexp::binaryFuncs[token], left, right));
+            return AexpP(new BinaryAexp(it->second, left, right));
         }
         if (token == ")") {
             int nextParen = skipToMatchingParen(i, start);
