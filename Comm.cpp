@@ -27,12 +27,6 @@ SeqComm::~SeqComm() {
 }
 
 // IfComm
-IfComm::IfComm(Bexp *cond, Comm *trueComm, Comm *falseComm) {
-    this->cond = cond;
-    this->trueComm = trueComm;
-    this->falseComm = falseComm;
-}
-
 void IfComm::eval(Store& store) {
     if (cond->eval(store)) {
         trueComm->eval(store);
@@ -43,17 +37,11 @@ void IfComm::eval(Store& store) {
 }
 
 IfComm::~IfComm() {
-    delete cond;
     delete trueComm;
     delete falseComm;
 }
 
 // WhileComm
-WhileComm::WhileComm(Bexp *cond, Comm *body) {
-    this->cond = cond;
-    this->body = body;
-}
-
 void WhileComm::eval(Store& store) {
     while (cond->eval(store)) {
         body->eval(store);
@@ -61,6 +49,5 @@ void WhileComm::eval(Store& store) {
 }
 
 WhileComm::~WhileComm() {
-    delete cond;
     delete body;
 }

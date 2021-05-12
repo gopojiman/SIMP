@@ -5,18 +5,21 @@
 
 class Bexp {
     public:
-        virtual bool eval(Store& store) = 0;
+        virtual bool eval(Store& store) const = 0;
         virtual ~Bexp() = default;
 };
 
+// Alias for Bexp smart pointer
+typedef unique_ptr<const Bexp> BexpP;
+
 class TrueExpr: public Bexp {
     public:
-        bool eval(Store& store);
+        bool eval(Store& store) const;
 };
 
 class FalseExpr: public Bexp {
     public:
-        bool eval(Store& store);
+        bool eval(Store& store) const;
 };
 
 class EqExpr: public Bexp {
@@ -27,7 +30,7 @@ class EqExpr: public Bexp {
     public:
         EqExpr(AexpP& left, AexpP& right):
             left(move(left)),right(move(right)) {};
-        bool eval(Store& store);
+        bool eval(Store& store) const;
 };
 
 class LessExpr: public Bexp {
@@ -38,39 +41,38 @@ class LessExpr: public Bexp {
     public:
         LessExpr(AexpP& left, AexpP& right):
             left(move(left)),right(move(right)) {};
-        bool eval(Store& store);
+        bool eval(Store& store) const;
 };
 
 class NotExpr: public Bexp {
     private:
-        Bexp *oper;
+        BexpP oper;
 
     public:
-        NotExpr(Bexp *oper);
-        bool eval(Store& store);
-        ~NotExpr();
+        NotExpr(BexpP& oper):oper(move(oper)) {};
+        bool eval(Store& store) const;
 };
 
 class AndExpr: public Bexp {
     private:
-        Bexp *left;
-        Bexp *right;
+        BexpP left;
+        BexpP right;
 
     public:
-        AndExpr(Bexp *left, Bexp *right);
-        bool eval(Store& store);
-        ~AndExpr();
+        AndExpr(BexpP& left, BexpP& right):
+            left(move(left)),right(move(right)) {};
+        bool eval(Store& store) const;
 };
 
 class OrExpr: public Bexp {
     private:
-        Bexp *left;
-        Bexp *right;
+        BexpP left;
+        BexpP right;
 
     public:
-        OrExpr(Bexp *left, Bexp *right);
-        bool eval(Store& store);
-        ~OrExpr();
+        OrExpr(BexpP& left, BexpP& right):
+            left(move(left)),right(move(right)) {};
+        bool eval(Store& store) const;
 };
 
 #endif

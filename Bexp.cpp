@@ -1,64 +1,29 @@
 #include "Bexp.h"
 
-// TrueExpr
-bool TrueExpr::eval(Store& store) {
+bool TrueExpr::eval(Store& store) const {
     return true;
 }
 
-// FalseExpr
-bool FalseExpr::eval(Store& store) {
+bool FalseExpr::eval(Store& store) const {
     return false;
 }
 
-// EqExpr
-bool EqExpr::eval(Store& store) {
+bool EqExpr::eval(Store& store) const {
     return left->eval(store) == right->eval(store);
 }
 
-// LessExpr
-bool LessExpr::eval(Store& store) {
+bool LessExpr::eval(Store& store) const {
     return left->eval(store) < right->eval(store);
 }
 
-// NotExpr
-NotExpr::NotExpr(Bexp *oper) {
-    this->oper = oper;
-}
-
-bool NotExpr::eval(Store& store) {
+bool NotExpr::eval(Store& store) const {
     return !(oper->eval(store));
 }
 
-NotExpr::~NotExpr() {
-    delete oper;
-}
-
-// AndExpr
-AndExpr::AndExpr(Bexp *left, Bexp *right) {
-    this->left = left;
-    this->right = right;
-}
-
-bool AndExpr::eval(Store& store) {
+bool AndExpr::eval(Store& store) const {
     return left->eval(store) && right->eval(store);
 }
 
-AndExpr::~AndExpr() {
-    delete left;
-    delete right;
-}
-
-// OrExpr
-OrExpr::OrExpr(Bexp *left, Bexp *right) {
-    this->left = left;
-    this->right = right;
-}
-
-bool OrExpr::eval(Store& store) {
+bool OrExpr::eval(Store& store) const {
     return left->eval(store) || right->eval(store);
-}
-
-OrExpr::~OrExpr() {
-    delete left;
-    delete right;
 }

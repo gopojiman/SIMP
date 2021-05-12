@@ -11,7 +11,7 @@ class Parser {
         int skipToMatchingBracket(int i, int start);
         int skipToMatchingElse(int i, int end);
         AexpP parseAexp(int start, int end);
-        Bexp *parseBexp(int start, int end);
+        BexpP parseBexp(int start, int end);
         Comm *parseComm(int start, int end);
 
     public:

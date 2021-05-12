@@ -10,6 +10,7 @@ class Aexp {
         virtual ~Aexp() = default;
 };
 
+// Alias for Aexp smart pointer
 typedef unique_ptr<const Aexp> AexpP;
 
 class NumExpr: public Aexp {

@@ -38,23 +38,25 @@ class SeqComm: public Comm {
 
 class IfComm: public Comm {
     private:
-        Bexp *cond;
+        BexpP cond;
         Comm *trueComm;
         Comm *falseComm;
 
     public:
-        IfComm(Bexp *cond, Comm *trueComm, Comm *falseComm);
+        IfComm(BexpP& cond, Comm *trueComm, Comm *falseComm):
+            cond(move(cond)),trueComm(trueComm),falseComm(falseComm) {};
         void eval(Store& store);
         ~IfComm();
 };
 
 class WhileComm: public Comm {
     private:
-        Bexp *cond;
+        BexpP cond;
         Comm *body;
 
     public:
-        WhileComm(Bexp *cond, Comm *body);
+        WhileComm(BexpP& cond, Comm *body):
+            cond(move(cond)),body(body) {};
         void eval(Store& store);
         ~WhileComm();
 };

@@ -119,28 +119,28 @@ AexpP Parser::parseAexp(int start, int end) {
     exit(1);
 }
 
-Bexp *Parser::parseBexp(int start, int end) {
+BexpP Parser::parseBexp(int start, int end) {
     if (start == end) {
         string token = tokens[start];
         if (token == "true") {
-            return new TrueExpr();
+            return BexpP(new TrueExpr());
         }
         else if (token == "false") {
-            return new FalseExpr();
+            return BexpP(new FalseExpr());
         }
     }
 
     int i = end;
     while (i >= start) {
         if (tokens[i] == "&&") {
-            Bexp *left = parseBexp(start, i - 1);
-            Bexp *right = parseBexp(i + 1, end);
-            return new AndExpr(left, right);
+            BexpP left = parseBexp(start, i - 1);
+            BexpP right = parseBexp(i + 1, end);
+            return BexpP(new AndExpr(left, right));
         }
         if (tokens[i] == "||") {
-            Bexp *left = parseBexp(start, i - 1);
-            Bexp *right = parseBexp(i + 1, end);
-            return new OrExpr(left, right);
+            BexpP left = parseBexp(start, i - 1);
+            BexpP right = parseBexp(i + 1, end);
+            return BexpP(new OrExpr(left, right));
         }
         if (tokens[i] == ")") {
             int nextParen = skipToMatchingParen(i, start);
@@ -153,7 +153,8 @@ Bexp *Parser::parseBexp(int start, int end) {
     }
 
     if (start < end && tokens[start] == "!") {
-        return new NotExpr(parseBexp(start + 1, end));
+        BexpP oper = parseBexp(start + 1, end);
+        return BexpP(new NotExpr(oper));
     }
 
     i = end;
@@ -161,12 +162,12 @@ Bexp *Parser::parseBexp(int start, int end) {
         if (tokens[i] == "==") {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
-            return new EqExpr(left, right);
+            return BexpP(new EqExpr(left, right));
         }
         if (tokens[i] == "<") {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
-            return new LessExpr(left, right);
+            return BexpP(new LessExpr(left, right));
         }
         i--;
     }
@@ -205,7 +206,7 @@ Comm *Parser::parseComm(int start, int end) {
         for (i = start + 2; i < end - 2; i++) {
             if (tokens[i] == "then") {
                 int nextElse = skipToMatchingElse(i, end);
-                Bexp *cond = parseBexp(start + 1, i - 1);
+                BexpP cond = parseBexp(start + 1, i - 1);
                 Comm *trueComm = parseComm(i + 1, nextElse - 1);
                 Comm *falseComm = parseComm(nextElse + 1, end);
                 return new IfComm(cond, trueComm, falseComm);
@@ -216,7 +217,7 @@ Comm *Parser::parseComm(int start, int end) {
     if (end - start > 2 && tokens[start] == "while") {
         for (i = start + 2; i < end; i++) {
             if (tokens[i] == "do") {
-                Bexp *cond = parseBexp(start + 1, i - 1);
+                BexpP cond = parseBexp(start + 1, i - 1);
                 Comm *body = parseComm(i + 1, end);
                 return new WhileComm(cond, body);
             }
