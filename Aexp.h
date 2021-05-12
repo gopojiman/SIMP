@@ -10,11 +10,7 @@ typedef function<int(int, int)> BinAexpFunc;
 
 class Aexp {
     public:
-        inline static map<string, BinAexpFunc> binaryFuncs = {
-            {"+", plus<int>()},
-            {"-", minus<int>()},
-            {"*", multiplies<int>()}
-        };
+        static map<string, BinAexpFunc> binaryFuncs; // mapping from binary operators to functions
         virtual int eval(Store& store) const = 0;
         virtual ~Aexp() = default;
 };
@@ -28,9 +24,7 @@ class Num: public Aexp {
 
     public:
         Num(int val):val(val) {};
-        int eval(Store& store) const {
-            return val;
-        }
+        int eval(Store& store) const;
 };
 
 class Var: public Aexp {
@@ -39,9 +33,7 @@ class Var: public Aexp {
 
     public:
         Var(string name):name(name) {};
-        int eval(Store& store) const {
-            return store.getVar(name);
-        }
+        int eval(Store& store) const;
 };
 
 class BinaryAexp: public Aexp {
@@ -53,9 +45,7 @@ class BinaryAexp: public Aexp {
     public:
         BinaryAexp(BinAexpFunc& func, AexpP& left, AexpP& right):
             func(func),left(move(left)),right(move(right)) {};
-        int eval(Store& store) const {
-            return func(left->eval(store), right->eval(store));
-        }
+        int eval(Store& store) const;
 };
 
 #endif
