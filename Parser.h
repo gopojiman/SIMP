@@ -15,7 +15,7 @@ class Parser {
         CommP parseComm(int start, int end);
 
     public:
-        Parser(const string& str);
+        Parser(istream& inputStream);
         CommP parseComm();
 };
 

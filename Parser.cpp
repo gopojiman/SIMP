@@ -1,6 +1,9 @@
 #include "Parser.h"
 
-Parser::Parser(const string& str) {
+Parser::Parser(istream& inputStream) {
+    string str;
+    getline(inputStream, str);
+
     size_t start = 0;
     size_t pos = str.find(" ");
     while (pos != string::npos) {
