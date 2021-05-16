@@ -7,6 +7,7 @@
 class Parser {
     private:
         vector<string> tokens;
+        void processToken(string& token);
         int skipToMatchingParen(int i, int start);
         int skipToMatchingBracket(int i, int start);
         int skipToMatchingElse(int i, int end);

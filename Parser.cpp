@@ -1,22 +1,39 @@
 #include "Parser.h"
 
 Parser::Parser(istream& inputStream) {
-    string str;
-    getline(inputStream, str);
-
-    size_t start = 0;
-    size_t pos = str.find(" ");
-    while (pos != string::npos) {
-        tokens.push_back(str.substr(start, pos - start));
-        start = pos + 1;
-        pos = str.find(" ", start);
+    string token;
+    inputStream >> token;
+    while(inputStream) {
+        processToken(token);
+        inputStream >> token;
     }
-    tokens.push_back(str.substr(start)); // get the last token
+}
 
-    // For testing
-    //for (int i = 0; i < tokens.size(); i++) {
-    //    cout << tokens[i] << endl;
-    //}
+CommP Parser::parseComm() {
+    return parseComm(0, tokens.size() - 1);
+}
+
+void Parser::processToken(string& token) {
+    if (token.length() > 1) {
+        char front = token.front();
+        char back = token.back();
+        if (back == ';' || back == '}' || back == ')') {
+            token.resize(token.size() - 1);
+            processToken(token);
+            tokens.push_back(string(1, back));
+        }
+        else if (front == '{' || front == '(' || front == '!') {
+            tokens.push_back(string(1, front));
+            token.erase(token.begin());
+            processToken(token);
+        }
+        else {
+            tokens.push_back(token);
+        }
+    }
+    else {
+        tokens.push_back(token);
+    }
 }
 
 // given a closing parenthese at position i, iterates
@@ -167,10 +184,6 @@ BexpP Parser::parseBexp(int start, int end) {
 
     cerr << "Error: Unable to parse Bexp" << endl;
     exit(1);
-}
-
-CommP Parser::parseComm() {
-    return parseComm(0, tokens.size() - 1);
 }
 
 CommP Parser::parseComm(int start, int end) {
