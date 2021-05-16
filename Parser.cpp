@@ -1,15 +1,19 @@
 #include "Parser.h"
 
 Parser::Parser(const string& str) {
-    char *c_str = new char[str.length() + 1];
-    strcpy(c_str, str.c_str());
-    char *token = strtok(c_str, " ");
-
-    while (token != NULL) {
-        tokens.push_back(string(token));
-        token = strtok(NULL, " ");
+    size_t start = 0;
+    size_t pos = str.find(" ");
+    while (pos != string::npos) {
+        tokens.push_back(str.substr(start, pos - start));
+        start = pos + 1;
+        pos = str.find(" ", start);
     }
-    delete[] c_str;
+    tokens.push_back(str.substr(start)); // get the last token
+
+    // For testing
+    //for (int i = 0; i < tokens.size(); i++) {
+    //    cout << tokens[i] << endl;
+    //}
 }
 
 // given a closing parenthese at position i, iterates
