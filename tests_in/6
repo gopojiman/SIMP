@@ -1,0 +1,5 @@
+x = 5; factorial = 1;
+while x >= 1 do {
+	factorial = factorial * x;
+	x = x - 1
+}
