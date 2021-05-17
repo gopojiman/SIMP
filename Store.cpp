@@ -23,7 +23,7 @@ ostream& operator << (ostream& os, const Store& store) {
         it++;
     }
     while (it != end) {
-        os << ", " << it->first << " → " << it->second;
+        os << ",\n " << it->first << " → " << it->second;
         it++;
     }
     return (os << '}');
