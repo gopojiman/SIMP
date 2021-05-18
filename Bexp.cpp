@@ -20,7 +20,13 @@ bool LiteralBexp::eval(Store& store) const {
 }
 
 bool CompareBexp::eval(Store& store) const {
-    return func(left->eval(store), right->eval(store));
+    const ValueP& leftEval = left->eval(store);
+    const ValueP& rightEval = right->eval(store);
+    if (leftEval->length < 0 && rightEval->length < 0) {
+        return func(leftEval->val(), rightEval->val());
+    }
+    // TODO: Array stuf here
+    return false;
 }
 
 bool NotBexp::eval(Store& store) const {

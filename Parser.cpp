@@ -88,7 +88,7 @@ AexpP Parser::parseAexp(int start, int end) {
         if (!token.empty() && 
             ((token.at(0) == '-' && token.find_first_not_of("1234567890", 1) == string::npos) ||
             (token.find_first_not_of("1234567890") == string::npos))) {
-                return AexpP(new Num(stoi(token)));
+                return AexpP(new ValueAexp(-1, stoi(token)));
             }
         else {
             return AexpP(new Var(token));

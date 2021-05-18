@@ -14,24 +14,34 @@ typedef unique_ptr<vector<int>> ArrP;
 // length less than 0 means it's an integer, 
 // which is stored in the first index of the vector
 class Value {
-    public:
-        int length;
+    private:
         ArrP arr;
-        Value(int length, ArrP& arr):length(length),arr(move(arr)) {};
+
+    public:
+        const int length;
+        // Integer Constructor
+        Value(int val):
+            length(-1),arr(ArrP(new vector<int>(1, val))) {};
+        // Array Constructor
+        Value(int length, int val):
+            length(length),arr(ArrP(new vector<int>(length, val))) {};
+        // Returns integer value
+        int val() const;
+        // Returns value at array index pos, 0 if pos if invalid
+        int at(int pos) const;        
 };
 
 // Value smart pointer
-typedef unique_ptr<Value> ValueP;
+typedef shared_ptr<Value> ValueP;
 ostream& operator << (ostream& os, const ValueP& valueP);
 
 class Store {
     private:
-        inline static ArrP defaultArr = ArrP(new vector<int>(1, 0));
-        inline static ValueP defaultValue = ValueP(new Value(-1, defaultArr));
+        inline static ValueP defaultValue = ValueP(new Value(0));
         map<string, ValueP> varMap;
     
     public:
-        void putNum(const string& key, int val);
+        void put(const string& key, ValueP valueP);
         ValueP& get(const string& key);
     
     friend ostream& operator << (ostream& os, const Store& store);

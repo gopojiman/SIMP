@@ -14,20 +14,22 @@ class Aexp {
         static map<string, BinAexpFunc> binaryFuncs0;
         // mapping from highest precedence binary operators to functions
         static map<string, BinAexpFunc> binaryFuncs1;
-        virtual int eval(Store& store) const = 0;
+        virtual ValueP eval(Store& store) const = 0;
         virtual ~Aexp() = default;
 };
 
 // Alias for Aexp smart pointer
 typedef unique_ptr<const Aexp> AexpP;
 
-class Num: public Aexp {
+class ValueAexp: public Aexp {
     private:
+        const int length;
         const int val;
 
     public:
-        Num(int val):val(val) {};
-        int eval(Store& store) const;
+        ValueAexp(int length, int val):
+            length(length),val(val) {};
+        ValueP eval(Store& store) const;
 };
 
 class Var: public Aexp {
@@ -36,7 +38,7 @@ class Var: public Aexp {
 
     public:
         Var(string name):name(name) {};
-        int eval(Store& store) const;
+        ValueP eval(Store& store) const;
 };
 
 class BinaryAexp: public Aexp {
@@ -48,7 +50,7 @@ class BinaryAexp: public Aexp {
     public:
         BinaryAexp(BinAexpFunc& func, AexpP& left, AexpP& right):
             func(func),left(move(left)),right(move(right)) {};
-        int eval(Store& store) const;
+        ValueP eval(Store& store) const;
 };
 
 #endif

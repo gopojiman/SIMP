@@ -9,15 +9,24 @@ map<string, BinAexpFunc> Aexp::binaryFuncs1 = {
     {"*", multiplies<int>()}
 };
 
-int Num::eval(Store& store) const {
-    return val;
+ValueP ValueAexp::eval(Store& store) const {
+    if (length < 0) {
+        return ValueP(new Value(val));
+    }
+    return ValueP(new Value(length, val));
 }
 
-int Var::eval(Store& store) const {
-    // PLACEHOLDER
-    return store.get(name)->arr->at(0);
+ValueP Var::eval(Store& store) const {
+    return store.get(name);
 }
 
-int BinaryAexp::eval(Store& store) const {
-    return func(left->eval(store), right->eval(store));
+ValueP BinaryAexp::eval(Store& store) const {
+    ValueP leftEval = left->eval(store);
+    ValueP rightEval = right->eval(store);
+    if (leftEval->length < 0 && rightEval->length < 0) {
+        int result = func(leftEval->val(), rightEval->val());
+        return ValueP(new Value(result));
+    }
+    // TODO: Array stuf here
+    return ValueP(new Value(0));
 }
