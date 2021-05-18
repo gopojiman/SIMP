@@ -14,7 +14,8 @@ int Num::eval(Store& store) const {
 }
 
 int Var::eval(Store& store) const {
-    return store.getVar(name);
+    // PLACEHOLDER
+    return store.get(name)->arr->at(0);
 }
 
 int BinaryAexp::eval(Store& store) const {

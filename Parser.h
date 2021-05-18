@@ -1,7 +1,6 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <vector>
 #include "Comm.h"
 
 class Parser {

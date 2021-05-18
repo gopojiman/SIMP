@@ -1,16 +1,29 @@
 #include "Store.h"
 
-void Store::putVar(const string& key, int val) {
-    varMap[key] = val;
+ostream& operator << (ostream& os, const ValueP& valueP) {
+    if (valueP->length < 0) {
+        return (os << valueP->arr->at(0));
+    }
+    else {
+        for (int i = 0; i < valueP->length; i++) {
+            os << valueP->arr->at(i) << " ";
+        }
+        return os;
+    }
 }
 
-int Store::getVar(const string& key) {
+void Store::putNum(const string& key, int val) {
+    ArrP arr(new vector<int>(1, val));
+    varMap[key] = ValueP(new Value(-1, arr));
+}
+
+ValueP& Store::get(const string& key) {
     auto it = varMap.find(key);
     if (it != varMap.end()) {
         return it->second;
     }
     else {
-        return 0;
+        return defaultValue;
     }
 }
 
