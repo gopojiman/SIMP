@@ -23,7 +23,7 @@ typedef unique_ptr<const Bexp> BexpP;
 
 class LiteralBexp: public Bexp {
     private:
-        bool val;
+        const bool val;
 
     public:
         LiteralBexp(bool val):val(val) {};
@@ -32,9 +32,9 @@ class LiteralBexp: public Bexp {
 
 class CompareBexp: public Bexp {
     private:
-        CompBexpFunc func;
-        AexpP left;
-        AexpP right;
+        const CompBexpFunc func;
+        const AexpP left;
+        const AexpP right;
     
     public:
         CompareBexp(CompBexpFunc& func, AexpP& left, AexpP& right):
@@ -44,7 +44,7 @@ class CompareBexp: public Bexp {
 
 class NotBexp: public Bexp {
     private:
-        BexpP oper;
+        const BexpP oper;
 
     public:
         NotBexp(BexpP& oper):oper(move(oper)) {};
@@ -53,9 +53,9 @@ class NotBexp: public Bexp {
 
 class LogicalBexp: public Bexp {
     private:
-        LogBexpFunc func;
-        BexpP left;
-        BexpP right;
+        const LogBexpFunc func;
+        const BexpP left;
+        const BexpP right;
 
     public:
         LogicalBexp(LogBexpFunc& func, BexpP& left, BexpP& right):

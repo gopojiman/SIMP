@@ -43,9 +43,9 @@ class Var: public Aexp {
 
 class BinaryAexp: public Aexp {
     private:
-        BinAexpFunc func;
-        AexpP left;
-        AexpP right;
+        const BinAexpFunc func;
+        const AexpP left;
+        const AexpP right;
     
     public:
         BinaryAexp(BinAexpFunc& func, AexpP& left, AexpP& right):

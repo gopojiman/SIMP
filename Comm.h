@@ -20,7 +20,7 @@ class SkipComm: public Comm {
 class AssignComm: public Comm {
     private:
         const string varName;
-        AexpP aexp;
+        const AexpP aexp;
 
     public:
         AssignComm(string varName, AexpP& aexp):
@@ -30,8 +30,8 @@ class AssignComm: public Comm {
 
 class SeqComm: public Comm {
     private:
-        CommP left;
-        CommP right;
+        const CommP left;
+        const CommP right;
 
     public:
         SeqComm(CommP& left, CommP& right):
@@ -41,9 +41,9 @@ class SeqComm: public Comm {
 
 class IfComm: public Comm {
     private:
-        BexpP cond;
-        CommP trueComm;
-        CommP falseComm;
+        const BexpP cond;
+        const CommP trueComm;
+        const CommP falseComm;
 
     public:
         IfComm(BexpP& cond, CommP& trueComm, CommP& falseComm):
@@ -55,8 +55,8 @@ class IfComm: public Comm {
 
 class WhileComm: public Comm {
     private:
-        BexpP cond;
-        CommP body;
+        const BexpP cond;
+        const CommP body;
 
     public:
         WhileComm(BexpP& cond, CommP& body):
