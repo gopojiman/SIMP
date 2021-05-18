@@ -82,7 +82,7 @@ int Parser::skipToMatchingElse(int i, int end) {
 }
 
 AexpP Parser::parseAexp(int start, int end) {
-    // Num or Var
+    // Value or Var
     if (start == end) {
         string token = tokens[start];
         if (!token.empty() && 
@@ -90,6 +90,16 @@ AexpP Parser::parseAexp(int start, int end) {
             (token.find_first_not_of("1234567890") == string::npos))) {
                 return AexpP(new ValueAexp(-1, stoi(token)));
             }
+        else if (token.front() == '[' && token.back() == ']') {
+            auto commaPos = token.find(',');
+            if (commaPos == string::npos) {
+                cerr << "Error: invalid array initialization expression" << endl;
+                exit(1);
+            }
+            int length = stoi(token.substr(1, commaPos - 1));
+            int val = stoi(token.substr(commaPos + 1, token.length() - commaPos - 2));
+            return AexpP(new ValueAexp(length, val));
+        }
         else {
             return AexpP(new Var(token));
         }

@@ -27,8 +27,11 @@ class Value {
             length(length),arr(ArrP(new vector<int>(length, val))) {};
         // Returns integer value
         int val() const;
-        // Returns value at array index pos, 0 if pos if invalid
-        int at(int pos) const;        
+        // Returns value at array index pos, 0 if pos is invalid,
+        // or val() if length < 0
+        int at(int pos) const;
+        // Puts value at array index pos, does nothing if pos is invalid
+        void put(int pos, int val);
 };
 
 // Value smart pointer

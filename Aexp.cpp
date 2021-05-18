@@ -27,6 +27,10 @@ ValueP BinaryAexp::eval(Store& store) const {
         int result = func(leftEval->val(), rightEval->val());
         return ValueP(new Value(result));
     }
-    // TODO: Array stuf here
-    return ValueP(new Value(0));
+    const int maxLen = max(leftEval->length, rightEval->length);
+    ValueP ret(new Value(maxLen, 0));
+    for (int i = 0; i < maxLen; i++) {
+        ret->put(i, func(leftEval->at(i), rightEval->at(i)));
+    }
+    return ret;
 }

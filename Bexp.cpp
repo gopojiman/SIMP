@@ -25,8 +25,13 @@ bool CompareBexp::eval(Store& store) const {
     if (leftEval->length < 0 && rightEval->length < 0) {
         return func(leftEval->val(), rightEval->val());
     }
-    // TODO: Array stuf here
-    return false;
+    const int maxLen = max(leftEval->length, rightEval->length);
+    for (int i = 0; i < maxLen; i++) {
+        if (!func(leftEval->at(i), rightEval->at(i))) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool NotBexp::eval(Store& store) const {
