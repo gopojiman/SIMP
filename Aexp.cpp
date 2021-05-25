@@ -7,7 +7,8 @@ map<string, BinAexpFunc> Aexp::binaryFuncs0 = {
 
 map<string, BinAexpFunc> Aexp::binaryFuncs1 = {
     {"*", multiplies<int>()},
-    {"/", [](int x, int y){return (y == 0) ? 0 : (x / y);}}
+    {"/", [](int x, int y){return (y == 0) ? 0 : (x / y);}},
+    {"%", [](int x, int y){return (y == 0) ? 0 : (x % y);}}
 };
 
 ValueP ValueAexp::eval(Store& store) const {
