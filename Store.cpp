@@ -1,4 +1,7 @@
 #include "Store.h"
+#include "Util.h"
+
+#define SHORT_PRINT_LENGTH 20
 
 int Value::val() const {
     return arr->at(0);
@@ -26,11 +29,19 @@ ostream& operator << (ostream& os, const ValueP& valueP) {
     }
     else {
         os << '[';
-        for (int i = 0; i < valueP->length - 1; i++) {
+        // only print first few elements unless using fullPrint option
+        bool fullPrint = Util::fullPrint || valueP->length <= SHORT_PRINT_LENGTH;
+        int maxInd = fullPrint ? (valueP->length - 1) : SHORT_PRINT_LENGTH;
+        for (int i = 0; i < maxInd; i++) {
             os << valueP->at(i) << ", ";
         }
         if (valueP->length > 0) {
-            os << valueP->at(valueP->length - 1);
+            if (fullPrint) {
+                os << valueP->at(valueP->length - 1);
+            }
+            else {
+                os << "...";
+            }
         }
         return (os << ']');
     }
