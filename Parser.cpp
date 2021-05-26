@@ -87,28 +87,52 @@ int Parser::skipToMatchingElse(int i, int end) {
     exit(1);
 }
 
+// given a '[' at position i in the given string, iterates
+// forwards to find the matching ']'
+int Parser::skipToMatchingSquareBracket(const string& token, int i) {
+    for (int j = i + 1; j < token.length(); j++) {
+        if (token[j] == ']') {
+            return j;
+        }
+        if (token[j] == '[') {
+            j = skipToMatchingSquareBracket(token, j);
+        }
+    }
+    cerr << "Error: Matching Square Bracket Not Found" << endl;
+    exit(1);
+}
+
 AexpP Parser::parseAexp(int start, int end) {
     if (start == end) {
         string token = tokens[start];
         // Num
         if (!token.empty() && verifyInt(token)) {
-                return AexpP(new ValueAexp(-1, stoi(token)));
+                return AexpP(new Num(stoi(token)));
             }
         // New Array
         else if (token.front() == '[' && token.back() == ']') {
-            auto commaPos = token.find(',');
-            if (commaPos == string::npos) {
+            int commaPos = -1;
+            for (int i = 1; i < token.length(); i++) {
+                if (token[i] == ',') {
+                    commaPos = i;
+                    break;
+                }
+                else if (token[i] == '[') {
+                    i = skipToMatchingSquareBracket(token, i);
+                }
+            }
+            if (commaPos == -1) {
                 cerr << "Error: invalid array initialization expression" << endl;
                 exit(1);
             }
-            const string& lengthStr = token.substr(1, commaPos - 1);
-            const string& valStr    = token.substr(commaPos + 1, token.length() - commaPos - 2);
-            if (!(verifyInt(lengthStr) && verifyInt(valStr))) {
-                cerr << "Error: invalid array initialization expression" << endl;
-                exit(1);
-            }
-            int length = stoi(lengthStr);
-            int val = stoi(valStr);
+            
+            tokens.push_back(token.substr(commaPos + 1, token.length() - commaPos - 2)); // val
+            tokens.push_back(token.substr(1, commaPos - 1)); // length
+            int tokensSize = tokens.size();
+            
+            AexpP length = parseAexp(tokensSize - 1, tokensSize - 1);
+            AexpP val    = parseAexp(tokensSize - 2, tokensSize - 2);
+            tokens.resize(tokensSize - 2);
             return AexpP(new ValueAexp(length, val));
         }
         // ArrayRef
@@ -295,8 +319,8 @@ CommP Parser::parseComm(int start, int end) {
         }
         if (comma1Pos == -1) { // one-iteration loop: e.g. for i in 5 do ...
             AexpP startAexp = parseAexp(start + 3, i - 1);
-            AexpP endAexp  = AexpP(new ValueAexp(-1, 0));
-            AexpP stepAexp = AexpP(new ValueAexp(-1, 0));
+            AexpP endAexp  = AexpP(new Num(0));
+            AexpP stepAexp = AexpP(new Num(0));
             CommP body = parseComm(i + 1, end);
             loopVars.erase(tokens[start + 1]);
             return CommP(new ForComm(tokens[start + 1], startAexp, endAexp, stepAexp, body));
@@ -304,7 +328,7 @@ CommP Parser::parseComm(int start, int end) {
         else if (comma2Pos == -1) { // loop with step of 1: e.g. for i in 1, 4 do ...
             AexpP startAexp = parseAexp(start + 3, comma1Pos - 1);
             AexpP endAexp   = parseAexp(comma1Pos + 1, i - 1);
-            AexpP stepAexp = AexpP(new ValueAexp(-1, 1));
+            AexpP stepAexp = AexpP(new Num(1));
             CommP body = parseComm(i + 1, end);
             loopVars.erase(tokens[start + 1]);
             return CommP(new ForComm(tokens[start + 1], startAexp, endAexp, stepAexp, body));

@@ -21,14 +21,26 @@ class Aexp {
 // Alias for Aexp smart pointer
 typedef unique_ptr<const Aexp> AexpP;
 
+// Always represents an integer
+class Num: public Aexp {
+    private:
+        const int val;
+    
+    public:
+        Num(int val):val(val) {};
+        ValueP eval(Store& store, int tid) const;
+};
+
+// Represents an integer if length < 0, or an array otherwise
+// length and val cannot be BinaryAexp in practice
 class ValueAexp: public Aexp {
     private:
-        const int length;
-        const int val;
+        const AexpP length;
+        const AexpP val;
 
     public:
-        ValueAexp(int length, int val):
-            length(length),val(val) {};
+        ValueAexp(AexpP& length, AexpP& val):
+            length(move(length)),val(move(val)) {};
         ValueP eval(Store& store, int tid) const;
 };
 

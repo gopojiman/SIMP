@@ -11,11 +11,19 @@ map<string, BinAexpFunc> Aexp::binaryFuncs1 = {
     {"%", [](int x, int y){return (y == 0) ? 0 : (x % y);}}
 };
 
+ValueP Num::eval(Store& store, int tid) const {
+    return ValueP(new Value(val));
+}
+
+
+// If length or val evaluate to arrays, the first element is used
 ValueP ValueAexp::eval(Store& store, int tid) const {
-    if (length < 0) {
-        return ValueP(new Value(val));
+    int l = length->eval(store, tid)->val();
+    int v =    val->eval(store, tid)->val();
+    if (l < 0) {
+        return ValueP(new Value(v));
     }
-    return ValueP(new Value(length, val));
+    return ValueP(new Value(l, v));
 }
 
 ValueP Var::eval(Store& store, int tid) const {

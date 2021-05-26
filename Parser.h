@@ -13,6 +13,7 @@ class Parser {
         int skipToMatchingParen(int i, int start);
         int skipToMatchingBracket(int i, int start);
         int skipToMatchingElse(int i, int end);
+        int skipToMatchingSquareBracket(const string& token, int i);
         AexpP parseAexp(int start, int end);
         BexpP parseBexp(int start, int end);
         CommP parseComm(int start, int end);
