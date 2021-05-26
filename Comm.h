@@ -5,7 +5,7 @@
 
 class Comm {
     public:
-        virtual void eval(Store& store) const = 0;
+        virtual void eval(Store& store, int tid) const = 0;
         virtual ~Comm() = default;
 };
 
@@ -14,7 +14,7 @@ typedef unique_ptr<const Comm> CommP;
 
 class SkipComm: public Comm {
     public:
-        void eval(Store& store) const;
+        void eval(Store& store, int tid) const;
 };
 
 class AssignComm: public Comm {
@@ -25,7 +25,7 @@ class AssignComm: public Comm {
     public:
         AssignComm(string varName, AexpP& aexp):
             varName(varName),aexp(move(aexp)) {};
-        void eval(Store& store) const;
+        void eval(Store& store, int tid) const;
 };
 
 class AssignNumRefComm: public Comm {
@@ -37,7 +37,7 @@ class AssignNumRefComm: public Comm {
     public:
         AssignNumRefComm(string varName, int index, AexpP& aexp):
             varName(varName),index(index),aexp(move(aexp)) {};
-        void eval(Store& store) const;
+        void eval(Store& store, int tid) const;
 };
 
 class SeqComm: public Comm {
@@ -48,7 +48,7 @@ class SeqComm: public Comm {
     public:
         SeqComm(CommP& left, CommP& right):
             left(move(left)),right(move(right)) {};
-        void eval(Store& store) const;
+        void eval(Store& store, int tid) const;
 };
 
 class IfComm: public Comm {
@@ -62,7 +62,7 @@ class IfComm: public Comm {
             cond(move(cond)),
             trueComm(move(trueComm)),
             falseComm(move(falseComm)) {};
-        void eval(Store& store) const;
+        void eval(Store& store, int tid) const;
 };
 
 class WhileComm: public Comm {
@@ -73,7 +73,21 @@ class WhileComm: public Comm {
     public:
         WhileComm(BexpP& cond, CommP& body):
             cond(move(cond)),body(move(body)) {};
-        void eval(Store& store) const;
+        void eval(Store& store, int tid) const;
+};
+
+class ForComm: public Comm {
+    private:
+        const string loopVarName;
+        const AexpP start;
+        const AexpP end;
+        const AexpP step;
+        const CommP body;
+    
+    public:
+        ForComm(string loopVarName, AexpP& start, AexpP& end, AexpP& step, CommP& body):
+            loopVarName(loopVarName),start(move(start)),end(move(end)),step(move(step)),body(move(body)) {};
+        void eval(Store& store, int tid) const;
 };
 
 #endif

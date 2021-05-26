@@ -15,13 +15,13 @@ map<string, LogBexpFunc> Bexp::logFuncs = {
     {"^^", [](bool b1, bool b2){return (b1 && !b2) || (!b1 && b2);}} // xor
 };
 
-bool LiteralBexp::eval(Store& store) const {
+bool LiteralBexp::eval(Store& store, int tid) const {
     return val;
 }
 
-bool CompareBexp::eval(Store& store) const {
-    const ValueP& leftEval = left->eval(store);
-    const ValueP& rightEval = right->eval(store);
+bool CompareBexp::eval(Store& store, int tid) const {
+    const ValueP& leftEval = left->eval(store, tid);
+    const ValueP& rightEval = right->eval(store, tid);
     if (leftEval->length < 0 && rightEval->length < 0) {
         return func(leftEval->val(), rightEval->val());
     }
@@ -34,10 +34,10 @@ bool CompareBexp::eval(Store& store) const {
     return true;
 }
 
-bool NotBexp::eval(Store& store) const {
-    return !(oper->eval(store));
+bool NotBexp::eval(Store& store, int tid) const {
+    return !(oper->eval(store, tid));
 }
 
-bool LogicalBexp::eval(Store& store) const {
-    return func(left->eval(store), right->eval(store));
+bool LogicalBexp::eval(Store& store, int tid) const {
+    return func(left->eval(store, tid), right->eval(store, tid));
 }

@@ -11,20 +11,20 @@ map<string, BinAexpFunc> Aexp::binaryFuncs1 = {
     {"%", [](int x, int y){return (y == 0) ? 0 : (x % y);}}
 };
 
-ValueP ValueAexp::eval(Store& store) const {
+ValueP ValueAexp::eval(Store& store, int tid) const {
     if (length < 0) {
         return ValueP(new Value(val));
     }
     return ValueP(new Value(length, val));
 }
 
-ValueP Var::eval(Store& store) const {
+ValueP Var::eval(Store& store, int tid) const {
     return store.get(name);
 }
 
-ValueP BinaryAexp::eval(Store& store) const {
-    ValueP leftEval = left->eval(store);
-    ValueP rightEval = right->eval(store);
+ValueP BinaryAexp::eval(Store& store, int tid) const {
+    ValueP leftEval = left->eval(store, tid);
+    ValueP rightEval = right->eval(store, tid);
     if (leftEval->length < 0 && rightEval->length < 0) {
         int result = func(leftEval->val(), rightEval->val());
         return ValueP(new Value(result));
@@ -37,6 +37,6 @@ ValueP BinaryAexp::eval(Store& store) const {
     return ret;
 }
 
-ValueP ArrayNumRef::eval(Store& store) const {
+ValueP ArrayNumRef::eval(Store& store, int tid) const {
     return ValueP(new Value(store.get(name)->at(index)));
 }

@@ -41,6 +41,6 @@ int main(int argc, char** argv) {
     CommP comm = parser->parseComm();
     delete parser;
 
-    comm->eval(store);
+    comm->eval(store, 0);
     cout << store << endl;
 }

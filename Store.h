@@ -44,6 +44,7 @@ class Store {
         map<string, ValueP> varMap;
     
     public:
+        map<string, int> loopVarMap;
         void put(const string& key, ValueP valueP);
         ValueP& get(const string& key);
     

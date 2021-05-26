@@ -14,7 +14,7 @@ class Bexp {
         static map<string, CompBexpFunc> compFuncs;
         // mapping from logical operators to functions
         static map<string, LogBexpFunc> logFuncs;
-        virtual bool eval(Store& store) const = 0;
+        virtual bool eval(Store& store, int tid) const = 0;
         virtual ~Bexp() = default;
 };
 
@@ -27,7 +27,7 @@ class LiteralBexp: public Bexp {
 
     public:
         LiteralBexp(bool val):val(val) {};
-        bool eval(Store& store) const;
+        bool eval(Store& store, int tid) const;
 };
 
 class CompareBexp: public Bexp {
@@ -39,7 +39,7 @@ class CompareBexp: public Bexp {
     public:
         CompareBexp(CompBexpFunc& func, AexpP& left, AexpP& right):
             func(func),left(move(left)),right(move(right)) {};
-        bool eval(Store& store) const;
+        bool eval(Store& store, int tid) const;
 };
 
 class NotBexp: public Bexp {
@@ -48,7 +48,7 @@ class NotBexp: public Bexp {
 
     public:
         NotBexp(BexpP& oper):oper(move(oper)) {};
-        bool eval(Store& store) const;
+        bool eval(Store& store, int tid) const;
 };
 
 class LogicalBexp: public Bexp {
@@ -60,7 +60,7 @@ class LogicalBexp: public Bexp {
     public:
         LogicalBexp(LogBexpFunc& func, BexpP& left, BexpP& right):
             func(func),left(move(left)),right(move(right)) {};
-        bool eval(Store& store) const;
+        bool eval(Store& store, int tid) const;
 };
 
 #endif

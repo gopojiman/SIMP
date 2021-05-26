@@ -14,7 +14,7 @@ class Aexp {
         static map<string, BinAexpFunc> binaryFuncs0;
         // mapping from highest precedence binary operators to functions
         static map<string, BinAexpFunc> binaryFuncs1;
-        virtual ValueP eval(Store& store) const = 0;
+        virtual ValueP eval(Store& store, int tid) const = 0;
         virtual ~Aexp() = default;
 };
 
@@ -29,7 +29,7 @@ class ValueAexp: public Aexp {
     public:
         ValueAexp(int length, int val):
             length(length),val(val) {};
-        ValueP eval(Store& store) const;
+        ValueP eval(Store& store, int tid) const;
 };
 
 class Var: public Aexp {
@@ -38,7 +38,7 @@ class Var: public Aexp {
 
     public:
         Var(string name):name(name) {};
-        ValueP eval(Store& store) const;
+        ValueP eval(Store& store, int tid) const;
 };
 
 class BinaryAexp: public Aexp {
@@ -50,7 +50,7 @@ class BinaryAexp: public Aexp {
     public:
         BinaryAexp(BinAexpFunc& func, AexpP& left, AexpP& right):
             func(func),left(move(left)),right(move(right)) {};
-        ValueP eval(Store& store) const;
+        ValueP eval(Store& store, int tid) const;
 };
 
 // Array reference with integer index, e.g. a[5]
@@ -61,7 +61,7 @@ class ArrayNumRef: public Aexp {
     
     public:
         ArrayNumRef(string name, int index):name(name),index(index) {};
-        ValueP eval(Store& store) const;
+        ValueP eval(Store& store, int tid) const;
 };
 
 #endif
