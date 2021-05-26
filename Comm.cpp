@@ -9,9 +9,17 @@ void AssignComm::eval(Store& store, int tid) const {
     store.put(varName, aexp->eval(store, tid));
 }
 
+void AssignComm::readsFrom(varSet& set) const {
+    aexp->readsFrom(set);
+}
+
 // If aexp evals to an array, the first element is used
 void AssignNumRefComm::eval(Store& store, int tid) const {
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
+}
+
+void AssignNumRefComm::readsFrom(varSet& set) const {
+    aexp->readsFrom(set);
 }
 
 void AssignLoopRefComm::eval(Store& store, int tid) const {
@@ -19,9 +27,18 @@ void AssignLoopRefComm::eval(Store& store, int tid) const {
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
 }
 
+void AssignLoopRefComm::readsFrom(varSet& set) const {
+    aexp->readsFrom(set);
+}
+
 void SeqComm::eval(Store& store, int tid) const {
     left->eval(store, tid);
     right->eval(store, tid);
+}
+
+void SeqComm::readsFrom(varSet& set) const {
+    left->readsFrom(set);
+    right->readsFrom(set);
 }
 
 void IfComm::eval(Store& store, int tid) const {
@@ -33,10 +50,21 @@ void IfComm::eval(Store& store, int tid) const {
     }
 }
 
+void IfComm::readsFrom(varSet& set) const {
+    cond->readsFrom(set);
+    trueComm->readsFrom(set);
+    falseComm->readsFrom(set);
+}
+
 void WhileComm::eval(Store& store, int tid) const {
     while (cond->eval(store, tid)) {
         body->eval(store, tid);
     }
+}
+
+void WhileComm::readsFrom(varSet& set) const {
+    cond->readsFrom(set);
+    body->readsFrom(set);
 }
 
 // If start, end, or step eval to arrays, first element is used
@@ -62,5 +90,11 @@ void ForComm::eval(Store& store, int tid) const {
             body->eval(store, tid);
         }
     }
+}
 
+void ForComm::readsFrom(varSet& set) const {
+    start->readsFrom(set);
+    end  ->readsFrom(set);
+    step ->readsFrom(set);
+    body ->readsFrom(set);
 }

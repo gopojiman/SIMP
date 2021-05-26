@@ -46,7 +46,7 @@ class ValueAexp: public Aexp {
         ValueAexp(AexpP& length, AexpP& val):
             length(move(length)),val(move(val)) {};
         ValueP eval(Store& store, int tid) const;
-        void readsFrom(varSet& set) const {};
+        void readsFrom(varSet& set) const;
 };
 
 class Var: public Aexp {

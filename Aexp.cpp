@@ -25,6 +25,11 @@ ValueP ValueAexp::eval(Store& store, int tid) const {
     return ValueP(new Value(l, v));
 }
 
+void ValueAexp::readsFrom(varSet& set) const {
+    length->readsFrom(set);
+    val   ->readsFrom(set);
+}
+
 ValueP Var::eval(Store& store, int tid) const {
     return store.get(name);
 }
