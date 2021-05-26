@@ -28,6 +28,18 @@ class AssignComm: public Comm {
         void eval(Store& store) const;
 };
 
+class AssignNumRefComm: public Comm {
+    private:
+        const string varName;
+        const int index;
+        const AexpP aexp;
+    
+    public:
+        AssignNumRefComm(string varName, int index, AexpP& aexp):
+            varName(varName),index(index),aexp(move(aexp)) {};
+        void eval(Store& store) const;
+};
+
 class SeqComm: public Comm {
     private:
         const CommP left;

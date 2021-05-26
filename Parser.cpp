@@ -265,8 +265,22 @@ CommP Parser::parseComm(int start, int end) {
     }
 
     if (end - start > 1 && tokens[start + 1] == "=") {
-        AexpP aexpr = parseAexp(start + 2, end);
-        return CommP(new AssignComm(tokens[start], aexpr));
+        AexpP aexp = parseAexp(start + 2, end);
+        const string& startToken = tokens[start];
+        if (startToken.back() == ']') {
+            auto lBracketPos = startToken.find('[');
+            if (lBracketPos == string::npos) {
+                cerr << "Error: invalid assign Comm" << endl;
+                exit(1);
+            }
+            const string& indexStr = startToken.substr(lBracketPos + 1, startToken.length() - lBracketPos - 2);
+            if (!verifyInt(indexStr)) {
+                cerr << "Error: invalid assign Comm" << endl;
+                exit(1);
+            }
+            return CommP(new AssignNumRefComm(startToken.substr(0, lBracketPos), stoi(indexStr), aexp));
+        }
+        return CommP(new AssignComm(startToken, aexp));
     }
 
     cerr << "Error: Unable to parse Comm" << endl;

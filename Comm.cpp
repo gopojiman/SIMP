@@ -8,6 +8,11 @@ void AssignComm::eval(Store& store) const {
     store.put(varName, aexp->eval(store));
 }
 
+// If aexp evals to an array, the first element is used
+void AssignNumRefComm::eval(Store& store) const {
+    store.get(varName)->put(index, aexp->eval(store)->val());
+}
+
 void SeqComm::eval(Store& store) const {
     left->eval(store);
     right->eval(store);
