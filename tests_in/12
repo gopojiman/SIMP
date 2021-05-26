@@ -1,0 +1,18 @@
+x_size = 50;
+for i in 0, x_size do
+    x[i] = i;
+
+x = [x_size,0];
+for i in 0, x_size do
+    x[i] = i;
+
+y_size = x_size / 2;
+y = [y_size,-33];
+
+a = x + y;
+b = x * y;
+c = y % x;
+d = x - 17;
+
+if y == -33 then skip else nope = -1;
+if x >  d   then skip else nope = -2
