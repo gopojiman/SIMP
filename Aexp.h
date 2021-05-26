@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <functional>
+#include "DDG.h"
 #include "Store.h"
 
 // Alias for Binary Aexp Function
@@ -15,6 +16,8 @@ class Aexp {
         // mapping from highest precedence binary operators to functions
         static map<string, BinAexpFunc> binaryFuncs1;
         virtual ValueP eval(Store& store, int tid) const = 0;
+        // if the Aexp reads from a variable, adds it to the set
+        virtual void readsFrom(varSet& set) const {};
         virtual ~Aexp() = default;
 };
 
@@ -51,6 +54,7 @@ class Var: public Aexp {
     public:
         Var(string name):name(name) {};
         ValueP eval(Store& store, int tid) const;
+        void readsFrom(varSet& set) const;
 };
 
 class LoopVar: public Aexp {
@@ -72,6 +76,7 @@ class BinaryAexp: public Aexp {
         BinaryAexp(BinAexpFunc& func, AexpP& left, AexpP& right):
             func(func),left(move(left)),right(move(right)) {};
         ValueP eval(Store& store, int tid) const;
+        void readsFrom(varSet& set) const;
 };
 
 // Array reference with integer index, e.g. a[5]
@@ -83,6 +88,7 @@ class ArrayNumRef: public Aexp {
     public:
         ArrayNumRef(string name, int index):name(name),index(index) {};
         ValueP eval(Store& store, int tid) const;
+        void readsFrom(varSet& set) const;
 };
 
 // Array reference with a LoopVar, e.g. a[i]
@@ -95,6 +101,7 @@ class ArrayLoopRef: public Aexp {
         ArrayLoopRef(string arrayName, string loopVar):
             arrayName(arrayName),loopVar(loopVar) {};
         ValueP eval(Store& store, int tid) const;
+        void readsFrom(varSet& set) const;
 };
 
 #endif
