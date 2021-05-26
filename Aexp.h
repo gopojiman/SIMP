@@ -17,7 +17,7 @@ class Aexp {
         static map<string, BinAexpFunc> binaryFuncs1;
         virtual ValueP eval(Store& store, int tid) const = 0;
         // if the Aexp reads from a variable, adds it to the set
-        virtual void readsFrom(varSet& set) const {};
+        virtual void readsFrom(varSet& set) const = 0;
         virtual ~Aexp() = default;
 };
 
@@ -32,6 +32,7 @@ class Num: public Aexp {
     public:
         Num(int val):val(val) {};
         ValueP eval(Store& store, int tid) const;
+        void readsFrom(varSet& set) const {};
 };
 
 // Represents an integer if length < 0, or an array otherwise
@@ -45,6 +46,7 @@ class ValueAexp: public Aexp {
         ValueAexp(AexpP& length, AexpP& val):
             length(move(length)),val(move(val)) {};
         ValueP eval(Store& store, int tid) const;
+        void readsFrom(varSet& set) const {};
 };
 
 class Var: public Aexp {
@@ -64,6 +66,7 @@ class LoopVar: public Aexp {
     public:
         LoopVar(string name):name(name) {};
         ValueP eval(Store& store, int tid) const;
+        void readsFrom(varSet& set) const {};
 };
 
 class BinaryAexp: public Aexp {
