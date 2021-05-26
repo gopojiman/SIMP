@@ -125,6 +125,10 @@ AexpP Parser::parseAexp(int start, int end) {
             }
             return AexpP(new ArrayNumRef(token.substr(0, lBracketPos), stoi(indexStr)));
         }
+        // LoopVar
+        else if (loopVars.count(token) > 0) {
+            return AexpP(new LoopVar(token));
+        }
         // Var
         else {
             return AexpP(new Var(token));

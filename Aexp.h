@@ -41,6 +41,15 @@ class Var: public Aexp {
         ValueP eval(Store& store, int tid) const;
 };
 
+class LoopVar: public Aexp {
+    private:
+        const string name;
+
+    public:
+        LoopVar(string name):name(name) {};
+        ValueP eval(Store& store, int tid) const;
+};
+
 class BinaryAexp: public Aexp {
     private:
         const BinAexpFunc func;

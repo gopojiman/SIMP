@@ -22,6 +22,10 @@ ValueP Var::eval(Store& store, int tid) const {
     return store.get(name);
 }
 
+ValueP LoopVar::eval(Store& store, int tid) const {
+    return ValueP(new Value(store.loopVarMap[name]->at(tid)));
+}
+
 ValueP BinaryAexp::eval(Store& store, int tid) const {
     ValueP leftEval = left->eval(store, tid);
     ValueP rightEval = right->eval(store, tid);
