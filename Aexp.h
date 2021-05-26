@@ -73,4 +73,16 @@ class ArrayNumRef: public Aexp {
         ValueP eval(Store& store, int tid) const;
 };
 
+// Array reference with a LoopVar, e.g. a[i]
+class ArrayLoopRef: public Aexp {
+    private:
+        const string arrayName;
+        const string loopVar;
+    
+    public:
+        ArrayLoopRef(string arrayName, string loopVar):
+            arrayName(arrayName),loopVar(loopVar) {};
+        ValueP eval(Store& store, int tid) const;
+};
+
 #endif

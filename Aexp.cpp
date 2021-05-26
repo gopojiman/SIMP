@@ -44,3 +44,8 @@ ValueP BinaryAexp::eval(Store& store, int tid) const {
 ValueP ArrayNumRef::eval(Store& store, int tid) const {
     return ValueP(new Value(store.get(name)->at(index)));
 }
+
+ValueP ArrayLoopRef::eval(Store& store, int tid) const {
+    int index = store.loopVarMap[loopVar]->at(tid);
+    return ValueP(new Value(store.get(arrayName)->at(index)));
+}

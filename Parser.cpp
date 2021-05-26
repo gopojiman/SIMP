@@ -120,6 +120,9 @@ AexpP Parser::parseAexp(int start, int end) {
             }
             const string& indexStr = token.substr(lBracketPos + 1, token.length() - lBracketPos - 2);
             if (!verifyInt(indexStr)) {
+                if (loopVars.count(indexStr) > 0) {
+                    return AexpP(new ArrayLoopRef(token.substr(0, lBracketPos), indexStr));
+                }
                 cerr << "Error: invalid array reference expression" << endl;
                 exit(1);
             }
@@ -327,6 +330,9 @@ CommP Parser::parseComm(int start, int end) {
             }
             const string& indexStr = startToken.substr(lBracketPos + 1, startToken.length() - lBracketPos - 2);
             if (!verifyInt(indexStr)) {
+                if (loopVars.count(indexStr) > 0) {
+                    return CommP(new AssignLoopRefComm(startToken.substr(0, lBracketPos), indexStr, aexp));
+                }
                 cerr << "Error: invalid assign Comm" << endl;
                 exit(1);
             }

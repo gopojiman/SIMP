@@ -40,6 +40,18 @@ class AssignNumRefComm: public Comm {
         void eval(Store& store, int tid) const;
 };
 
+class AssignLoopRefComm: public Comm {
+    private:
+        const string varName;
+        const string loopVar;
+        const AexpP aexp;
+    
+    public:
+        AssignLoopRefComm(string varName, string loopVar, AexpP& aexp):
+            varName(varName),loopVar(loopVar),aexp(move(aexp)) {};
+        void eval(Store& store, int tid) const;
+};
+
 class SeqComm: public Comm {
     private:
         const CommP left;

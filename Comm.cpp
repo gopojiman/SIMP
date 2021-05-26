@@ -14,6 +14,11 @@ void AssignNumRefComm::eval(Store& store, int tid) const {
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
 }
 
+void AssignLoopRefComm::eval(Store& store, int tid) const {
+    int index = store.loopVarMap[loopVar]->at(tid);
+    store.get(varName)->put(index, aexp->eval(store, tid)->val());
+}
+
 void SeqComm::eval(Store& store, int tid) const {
     left->eval(store, tid);
     right->eval(store, tid);
@@ -34,6 +39,7 @@ void WhileComm::eval(Store& store, int tid) const {
     }
 }
 
+// If start, end, or step eval to arrays, first element is used
 void ForComm::eval(Store& store, int tid) const {
     int start = this->start->eval(store, tid)->val();
     int end   = this->end  ->eval(store, tid)->val();
