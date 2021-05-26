@@ -44,7 +44,8 @@ class Store {
         map<string, ValueP> varMap;
     
     public:
-        map<string, int> loopVarMap;
+        // each loopVar has up to one value per thread
+        map<string, ArrP> loopVarMap;
         void put(const string& key, ValueP valueP);
         ValueP& get(const string& key);
     

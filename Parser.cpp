@@ -17,7 +17,7 @@ void Parser::processToken(string& token) {
     if (token.length() > 1) {
         char front = token.front();
         char back = token.back();
-        if (back == ';' || back == '}' || back == ')') {
+        if (back == ';' || back == '}' || back == ')' || back == ',') {
             token.resize(token.size() - 1);
             processToken(token);
             tokens.push_back(string(1, back));
@@ -261,6 +261,54 @@ CommP Parser::parseComm(int start, int end) {
                 CommP body = parseComm(i + 1, end);
                 return CommP(new WhileComm(cond, body));
             }
+        }
+    }
+
+    if (end - start > 4 && tokens[start] == "for" && tokens[start + 2] == "in") {
+        if (loopVars.count(tokens[start + 1]) > 0) {
+            cerr << "Error: Cannot reuse the same loop variable in inner for loop" << endl;
+            exit(1);
+        }
+        loopVars.insert(tokens[start + 1]);
+        int comma1Pos = -1;
+        int comma2Pos = -1;
+        int i = start + 4;
+        for (; i < end; i++) {
+            if (tokens[i] == ",") {
+                if (comma1Pos == -1) {
+                    comma1Pos = i;
+                }
+                else if (comma2Pos == -1) {
+                    comma2Pos = i;
+                }
+            }
+            else if (tokens[i] == "do") {
+                break;
+            }
+        }
+        if (comma1Pos == -1) { // one-iteration loop: e.g. for i in 5 do ...
+            AexpP startAexp = parseAexp(start + 3, i - 1);
+            AexpP endAexp  = AexpP(new ValueAexp(-1, 0));
+            AexpP stepAexp = AexpP(new ValueAexp(-1, 0));
+            CommP body = parseComm(i + 1, end);
+            loopVars.erase(tokens[start + 1]);
+            return CommP(new ForComm(tokens[start + 1], startAexp, endAexp, stepAexp, body));
+        }
+        else if (comma2Pos == -1) { // loop with step of 1: e.g. for i in 1, 4 do ...
+            AexpP startAexp = parseAexp(start + 3, comma1Pos - 1);
+            AexpP endAexp   = parseAexp(comma1Pos + 1, i - 1);
+            AexpP stepAexp = AexpP(new ValueAexp(-1, 1));
+            CommP body = parseComm(i + 1, end);
+            loopVars.erase(tokens[start + 1]);
+            return CommP(new ForComm(tokens[start + 1], startAexp, endAexp, stepAexp, body));
+        }
+        else { // general loop: e.g. for i in 1, 20, 5 do ...
+            AexpP startAexp = parseAexp(start + 3, comma1Pos - 1);
+            AexpP endAexp   = parseAexp(comma1Pos + 1, comma2Pos - 1);
+            AexpP stepAexp  = parseAexp(comma2Pos + 1, i - 1);
+            CommP body = parseComm(i + 1, end);
+            loopVars.erase(tokens[start + 1]);
+            return CommP(new ForComm(tokens[start + 1], startAexp, endAexp, stepAexp, body));
         }
     }
 

@@ -1,4 +1,5 @@
 #include "Comm.h"
+#include "Util.h"
 
 void SkipComm::eval(Store& store, int tid) const {
     return;
@@ -38,5 +39,22 @@ void ForComm::eval(Store& store, int tid) const {
     int end   = this->end  ->eval(store, tid)->val();
     int step  = this->step ->eval(store, tid)->val();
 
-    //...
+    store.loopVarMap[loopVarName] = ArrP(new vector<int>(Util::n_threads));
+    int& loopVar = store.loopVarMap[loopVarName]->at(tid);
+    loopVar = start;
+    
+    if (step == 0) {
+        body->eval(store, tid);
+    }
+    else if (step > 0) {
+        for (; loopVar < end; loopVar += step) {
+            body->eval(store, tid);
+        }
+    }
+    else {
+        for (; loopVar > end; loopVar += step) {
+            body->eval(store, tid);
+        }
+    }
+
 }
