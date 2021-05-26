@@ -7,6 +7,7 @@ class Comm {
     public:
         virtual void eval(Store& store, int tid) const = 0;
         virtual void readsFrom(varSet& set) const = 0;
+        virtual void writesTo(varSet& set) const = 0;
         virtual ~Comm() = default;
 };
 
@@ -17,6 +18,7 @@ class SkipComm: public Comm {
     public:
         void eval(Store& store, int tid) const;
         void readsFrom(varSet& set) const {};
+        void writesTo(varSet& set) const {};
 };
 
 class AssignComm: public Comm {
@@ -29,6 +31,7 @@ class AssignComm: public Comm {
             varName(varName),aexp(move(aexp)) {};
         void eval(Store& store, int tid) const;
         void readsFrom(varSet& set) const;
+        void writesTo(varSet& set) const;
 };
 
 class AssignNumRefComm: public Comm {
@@ -42,6 +45,7 @@ class AssignNumRefComm: public Comm {
             varName(varName),index(index),aexp(move(aexp)) {};
         void eval(Store& store, int tid) const;
         void readsFrom(varSet& set) const;
+        void writesTo(varSet& set) const;
 };
 
 class AssignLoopRefComm: public Comm {
@@ -55,6 +59,7 @@ class AssignLoopRefComm: public Comm {
             varName(varName),loopVar(loopVar),aexp(move(aexp)) {};
         void eval(Store& store, int tid) const;
         void readsFrom(varSet& set) const;
+        void writesTo(varSet& set) const;
 };
 
 class SeqComm: public Comm {
@@ -67,6 +72,7 @@ class SeqComm: public Comm {
             left(move(left)),right(move(right)) {};
         void eval(Store& store, int tid) const;
         void readsFrom(varSet& set) const;
+        void writesTo(varSet& set) const;
 };
 
 class IfComm: public Comm {
@@ -82,6 +88,7 @@ class IfComm: public Comm {
             falseComm(move(falseComm)) {};
         void eval(Store& store, int tid) const;
         void readsFrom(varSet& set) const;
+        void writesTo(varSet& set) const;
 };
 
 class WhileComm: public Comm {
@@ -94,6 +101,7 @@ class WhileComm: public Comm {
             cond(move(cond)),body(move(body)) {};
         void eval(Store& store, int tid) const;
         void readsFrom(varSet& set) const;
+        void writesTo(varSet& set) const;
 };
 
 class ForComm: public Comm {
@@ -109,6 +117,7 @@ class ForComm: public Comm {
             loopVarName(loopVarName),start(move(start)),end(move(end)),step(move(step)),body(move(body)) {};
         void eval(Store& store, int tid) const;
         void readsFrom(varSet& set) const;
+        void writesTo(varSet& set) const;
 };
 
 #endif

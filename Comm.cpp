@@ -13,6 +13,10 @@ void AssignComm::readsFrom(varSet& set) const {
     aexp->readsFrom(set);
 }
 
+void AssignComm::writesTo(varSet& set) const {
+    set.valueList.push_back(varName);
+}
+
 // If aexp evals to an array, the first element is used
 void AssignNumRefComm::eval(Store& store, int tid) const {
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
@@ -20,6 +24,11 @@ void AssignNumRefComm::eval(Store& store, int tid) const {
 
 void AssignNumRefComm::readsFrom(varSet& set) const {
     aexp->readsFrom(set);
+}
+
+void AssignNumRefComm::writesTo(varSet& set) const {
+    ANRS anrs = {varName, index};
+    set.anrList.push_back(anrs);
 }
 
 void AssignLoopRefComm::eval(Store& store, int tid) const {
@@ -31,6 +40,11 @@ void AssignLoopRefComm::readsFrom(varSet& set) const {
     aexp->readsFrom(set);
 }
 
+void AssignLoopRefComm::writesTo(varSet& set) const {
+    ALRS alrs = {varName, loopVar};
+    set.alrList.push_back(alrs);
+}
+
 void SeqComm::eval(Store& store, int tid) const {
     left->eval(store, tid);
     right->eval(store, tid);
@@ -39,6 +53,11 @@ void SeqComm::eval(Store& store, int tid) const {
 void SeqComm::readsFrom(varSet& set) const {
     left->readsFrom(set);
     right->readsFrom(set);
+}
+
+void SeqComm::writesTo(varSet& set) const {
+    left->writesTo(set);
+    right->writesTo(set);
 }
 
 void IfComm::eval(Store& store, int tid) const {
@@ -56,6 +75,11 @@ void IfComm::readsFrom(varSet& set) const {
     falseComm->readsFrom(set);
 }
 
+void IfComm::writesTo(varSet& set) const {
+    trueComm->writesTo(set);
+    falseComm->writesTo(set);
+}
+
 void WhileComm::eval(Store& store, int tid) const {
     while (cond->eval(store, tid)) {
         body->eval(store, tid);
@@ -65,6 +89,10 @@ void WhileComm::eval(Store& store, int tid) const {
 void WhileComm::readsFrom(varSet& set) const {
     cond->readsFrom(set);
     body->readsFrom(set);
+}
+
+void WhileComm::writesTo(varSet& set) const {
+    body->writesTo(set);
 }
 
 // If start, end, or step eval to arrays, first element is used
@@ -97,4 +125,8 @@ void ForComm::readsFrom(varSet& set) const {
     end  ->readsFrom(set);
     step ->readsFrom(set);
     body ->readsFrom(set);
+}
+
+void ForComm::writesTo(varSet& set) const {
+    body->writesTo(set);
 }
