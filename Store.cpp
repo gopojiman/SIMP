@@ -1,7 +1,8 @@
 #include "Store.h"
 #include "Util.h"
 
-#define SHORT_PRINT_LENGTH 20
+// how many elements to print out if not doing full print
+#define SHORT_PRINT_LENGTH 10
 
 int Value::val() const {
     return arr->at(0);

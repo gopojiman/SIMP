@@ -36,3 +36,7 @@ ValueP BinaryAexp::eval(Store& store) const {
     }
     return ret;
 }
+
+ValueP ArrayNumRef::eval(Store& store) const {
+    return ValueP(new Value(store.get(name)->at(index)));
+}

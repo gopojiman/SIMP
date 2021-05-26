@@ -53,4 +53,15 @@ class BinaryAexp: public Aexp {
         ValueP eval(Store& store) const;
 };
 
+// Array reference with integer index, e.g. a[5]
+class ArrayNumRef: public Aexp {
+    private:
+        const string name;
+        const int index;
+    
+    public:
+        ArrayNumRef(string name, int index):name(name),index(index) {};
+        ValueP eval(Store& store) const;
+};
+
 #endif

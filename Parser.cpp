@@ -36,6 +36,12 @@ void Parser::processToken(string& token) {
     }
 }
 
+// true -> token is a valid integer, false otherwise
+bool Parser::verifyInt(const string& token) {
+    return ((token.at(0) == '-' && token.find_first_not_of("1234567890", 1) == string::npos) ||
+            (token.find_first_not_of("1234567890") == string::npos));
+}
+
 // given a closing parenthese at position i, iterates
 // backwards to find the matching opening parenthese
 int Parser::skipToMatchingParen(int i, int start) {
@@ -82,24 +88,44 @@ int Parser::skipToMatchingElse(int i, int end) {
 }
 
 AexpP Parser::parseAexp(int start, int end) {
-    // Value or Var
     if (start == end) {
         string token = tokens[start];
-        if (!token.empty() && 
-            ((token.at(0) == '-' && token.find_first_not_of("1234567890", 1) == string::npos) ||
-            (token.find_first_not_of("1234567890") == string::npos))) {
+        // Num
+        if (!token.empty() && verifyInt(token)) {
                 return AexpP(new ValueAexp(-1, stoi(token)));
             }
+        // New Array
         else if (token.front() == '[' && token.back() == ']') {
             auto commaPos = token.find(',');
             if (commaPos == string::npos) {
                 cerr << "Error: invalid array initialization expression" << endl;
                 exit(1);
             }
-            int length = stoi(token.substr(1, commaPos - 1));
-            int val = stoi(token.substr(commaPos + 1, token.length() - commaPos - 2));
+            const string& lengthStr = token.substr(1, commaPos - 1);
+            const string& valStr    = token.substr(commaPos + 1, token.length() - commaPos - 2);
+            if (!(verifyInt(lengthStr) && verifyInt(valStr))) {
+                cerr << "Error: invalid array initialization expression" << endl;
+                exit(1);
+            }
+            int length = stoi(lengthStr);
+            int val = stoi(valStr);
             return AexpP(new ValueAexp(length, val));
         }
+        // ArrayRef
+        else if (token.back() == ']') {
+            auto lBracketPos = token.find('[');
+            if (lBracketPos == string::npos) {
+                cerr << "Error: invalid array reference expression" << endl;
+                exit(1);
+            }
+            const string& indexStr = token.substr(lBracketPos + 1, token.length() - lBracketPos - 2);
+            if (!verifyInt(indexStr)) {
+                cerr << "Error: invalid array reference expression" << endl;
+                exit(1);
+            }
+            return AexpP(new ArrayNumRef(token.substr(0, lBracketPos), stoi(indexStr)));
+        }
+        // Var
         else {
             return AexpP(new Var(token));
         }
