@@ -5,7 +5,7 @@
 #define SHORT_PRINT_LENGTH 10
 
 int Value::val() const {
-    return arr->at(0);
+    return this->at(0);
 }
 
 int Value::at(int pos) const {
@@ -67,11 +67,11 @@ ostream& operator << (ostream& os, const Store& store) {
     auto it = store.varMap.begin();
     auto end = store.varMap.end();
     if (it != end) {
-        os << it->first << " → " << it->second;
+        os << it->first << " -> " << it->second;
         it++;
     }
     while (it != end) {
-        os << ",\n " << it->first << " → " << it->second;
+        os << ",\n " << it->first << " -> " << it->second;
         it++;
     }
     return (os << '}');

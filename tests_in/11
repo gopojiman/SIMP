@@ -1,0 +1,18 @@
+i = -69;
+x_size = 18;
+x = [x_size,0];
+for i in 1, x_size - 4 + 4, 2 do
+    x[i] = i;
+a = x[6];
+b = x[7];
+c = x[-3];
+d = x[987987];
+e = q[3];
+
+y = [0,7];
+f = y[0];
+
+z_size = x_size - 5;
+z = [z_size,0];
+for i in 0, z_size do
+    for j in i + 9 do z[i] = x[j]
