@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <shared_mutex>
 using namespace std;
 
 // Array smart pointer
@@ -42,12 +43,13 @@ class Store {
     private:
         inline static ValueP defaultValue = ValueP(new Value(0));
         map<string, ValueP> varMap;
+        shared_mutex varMapMutex;
     
     public:
         // each loopVar has up to one value per thread
         map<string, ArrP> loopVarMap;
-        void put(const string& key, ValueP valueP);
-        ValueP& get(const string& key);
+        void put(string key, ValueP valueP);
+        ValueP& get(string key);
     
     friend ostream& operator << (ostream& os, const Store& store);
 };

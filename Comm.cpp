@@ -51,8 +51,21 @@ void AssignLoopRefComm::writesTo(VarSet& set) const {
 }
 
 void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
+#ifdef NOPARALLEL
     left->eval(store, tid, workQueue);
     right->eval(store, tid, workQueue);
+#else
+    if (notInterleavable(left, right)) {
+        left->eval(store, tid, workQueue);
+        right->eval(store, tid, workQueue);
+    }
+    else {
+        TaskP task(new Task(right));
+        workQueue.enqueue(task);
+        left->eval(store, tid, workQueue);
+        while(!(task->isDone()));
+    }
+#endif
 }
 
 void SeqComm::readsFrom(VarSet& set) const {

@@ -48,16 +48,32 @@ ostream& operator << (ostream& os, const ValueP& valueP) {
     }
 }
 
-void Store::put(const string& key, ValueP valueP) {
+void Store::put(string key, ValueP valueP) {
+#ifndef NOPARALLEL
+    varMapMutex.lock();
+#endif
     varMap[key] = move(valueP);
+#ifndef NOPARALLEL
+    varMapMutex.unlock();
+#endif
 }
 
-ValueP& Store::get(const string& key) {
+ValueP& Store::get(string key) {
+#ifndef NOPARALLEL
+    varMapMutex.lock_shared();
+#endif
     auto it = varMap.find(key);
     if (it != varMap.end()) {
-        return it->second;
+        ValueP& ret = it->second;
+#ifndef NOPARALLEL
+        varMapMutex.unlock_shared();
+#endif
+        return ret;
     }
     else {
+#ifndef NOPARALLEL
+        varMapMutex.unlock_shared();
+#endif
         return defaultValue;
     }
 }
