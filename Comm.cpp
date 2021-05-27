@@ -1,11 +1,11 @@
 #include "Comm.h"
 #include "Util.h"
 
-void SkipComm::eval(Store& store, int tid) const {
+void SkipComm::eval(Store& store, int tid, CQ& workQueue) const {
     return;
 }
 
-void AssignComm::eval(Store& store, int tid) const {
+void AssignComm::eval(Store& store, int tid, CQ& workQueue) const {
     store.put(varName, aexp->eval(store, tid));
 }
 
@@ -18,7 +18,7 @@ void AssignComm::writesTo(VarSet& set) const {
 }
 
 // If aexp evals to an array, the first element is used
-void AssignNumRefComm::eval(Store& store, int tid) const {
+void AssignNumRefComm::eval(Store& store, int tid, CQ& workQueue) const {
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
 }
 
@@ -31,7 +31,7 @@ void AssignNumRefComm::writesTo(VarSet& set) const {
     set.anrList.push_back(anrs);
 }
 
-void AssignLoopRefComm::eval(Store& store, int tid) const {
+void AssignLoopRefComm::eval(Store& store, int tid, CQ& workQueue) const {
     int index = store.loopVarMap[loopVar]->at(tid);
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
 }
@@ -45,9 +45,9 @@ void AssignLoopRefComm::writesTo(VarSet& set) const {
     set.alrList.push_back(alrs);
 }
 
-void SeqComm::eval(Store& store, int tid) const {
-    left->eval(store, tid);
-    right->eval(store, tid);
+void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
+    left->eval(store, tid, workQueue);
+    right->eval(store, tid, workQueue);
 }
 
 void SeqComm::readsFrom(VarSet& set) const {
@@ -60,12 +60,12 @@ void SeqComm::writesTo(VarSet& set) const {
     right->writesTo(set);
 }
 
-void IfComm::eval(Store& store, int tid) const {
+void IfComm::eval(Store& store, int tid, CQ& workQueue) const {
     if (cond->eval(store, tid)) {
-        trueComm->eval(store, tid);
+        trueComm->eval(store, tid, workQueue);
     }
     else {
-        falseComm->eval(store, tid);
+        falseComm->eval(store, tid, workQueue);
     }
 }
 
@@ -80,9 +80,9 @@ void IfComm::writesTo(VarSet& set) const {
     falseComm->writesTo(set);
 }
 
-void WhileComm::eval(Store& store, int tid) const {
+void WhileComm::eval(Store& store, int tid, CQ& workQueue) const {
     while (cond->eval(store, tid)) {
-        body->eval(store, tid);
+        body->eval(store, tid, workQueue);
     }
 }
 
@@ -96,7 +96,7 @@ void WhileComm::writesTo(VarSet& set) const {
 }
 
 // If start, end, or step eval to arrays, first element is used
-void ForComm::eval(Store& store, int tid) const {
+void ForComm::eval(Store& store, int tid, CQ& workQueue) const {
     int start = this->start->eval(store, tid)->val();
     int end   = this->end  ->eval(store, tid)->val();
     int step  = this->step ->eval(store, tid)->val();
@@ -106,16 +106,16 @@ void ForComm::eval(Store& store, int tid) const {
     loopVar = start;
     
     if (step == 0) {
-        body->eval(store, tid);
+        body->eval(store, tid, workQueue);
     }
     else if (step > 0) {
         for (; loopVar < end; loopVar += step) {
-            body->eval(store, tid);
+            body->eval(store, tid, workQueue);
         }
     }
     else {
         for (; loopVar > end; loopVar += step) {
-            body->eval(store, tid);
+            body->eval(store, tid, workQueue);
         }
     }
 }
