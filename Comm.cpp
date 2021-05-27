@@ -1,6 +1,11 @@
 #include "Comm.h"
 #include "Util.h"
 
+void Task::eval(Store& store, int tid, CQ& workQueue) {
+    comm->eval(store, tid, workQueue);
+    done.store(true);
+}
+
 void SkipComm::eval(Store& store, int tid, CQ& workQueue) const {
     return;
 }

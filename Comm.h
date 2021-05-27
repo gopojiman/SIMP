@@ -5,9 +5,23 @@
 #include "concurrentqueue.h"
 
 class Comm;
-// Alias for Comm smart pointer
-typedef unique_ptr<const Comm> CommP;
-typedef moodycamel::ConcurrentQueue<CommP> CQ;
+class Task;
+typedef shared_ptr<const Comm> CommP;
+typedef shared_ptr<Task> TaskP;
+typedef moodycamel::ConcurrentQueue<TaskP> CQ;
+
+// Wrapper class for Comm that sets an atomic boolean flag
+// after it's evaluated
+class Task {
+    private:
+        const CommP comm;     
+        atomic_bool done;
+    
+    public:
+        Task(CommP comm):comm(comm),done(false) {};
+        bool isDone() {return done.load();};
+        void eval(Store& store, int tid, CQ& workQueue);
+};
 
 class Comm {
     public:

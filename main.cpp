@@ -4,15 +4,15 @@
 #include "Util.h"
 
 void thread_func(int tid, atomic_int *finished_threads, Store *store, CQ *workQueue) {
-    CommP comm;
+    TaskP task;
     bool finished = false;
     while (finished_threads->load() < Util::n_threads) {
-        if (workQueue->try_dequeue(comm)) {
+        if (workQueue->try_dequeue(task)) {
             if (finished) {
                 finished = false;
                 atomic_fetch_add(finished_threads, -1);
             }
-            comm->eval(*store, tid, *workQueue);
+            task->eval(*store, tid, *workQueue);
         } else if (!finished) {
             finished = true;
             atomic_fetch_add(finished_threads, 1);
@@ -65,7 +65,9 @@ int main(int argc, char** argv) {
 #else
     atomic_int finished_threads(0);
     thread threads[Util::n_threads];
-    workQueue.enqueue(move(comm));
+
+    TaskP task(new Task(comm));
+    workQueue.enqueue(task);
 
     for (int i = 0; i < Util::n_threads; i++) {
         threads[i] = thread(thread_func, i, &finished_threads, &store, &workQueue);
