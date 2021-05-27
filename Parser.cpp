@@ -258,11 +258,12 @@ CommP Parser::parseComm(int start, int end) {
         return CommP(new SkipComm());
     }
 
+    list<CommP> comms;
+    int semicolonPos = end + 1;
     for (int i = end; i >= start; i--) {
         if (tokens[i] == ";") {
-            CommP left = parseComm(start, i - 1);
-            CommP right = parseComm(i + 1, end);
-            return CommP(new SeqComm(left, right));
+            comms.push_front(parseComm(i + 1, semicolonPos - 1));
+            semicolonPos = i;
         }
         if (tokens[i] == "}") {
             int nextBrack = skipToMatchingBracket(i, start);
@@ -271,6 +272,10 @@ CommP Parser::parseComm(int start, int end) {
             }
             i = nextBrack;
         }
+    }
+    if (semicolonPos != end + 1) {
+        comms.push_front(parseComm(start, semicolonPos - 1));
+        return CommP(new SeqComm(comms));
     }
 
     if (end - start > 4 && tokens[start] == "if") {

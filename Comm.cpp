@@ -52,30 +52,36 @@ void AssignLoopRefComm::writesTo(VarSet& set) const {
 
 void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
 #ifdef NOPARALLEL
-    left->eval(store, tid, workQueue);
-    right->eval(store, tid, workQueue);
+    for (auto comm : comms) {
+        comm->eval(store, tid, workQueue);
+    }
 #else
-    if (notInterleavable(left, right)) {
-        left->eval(store, tid, workQueue);
-        right->eval(store, tid, workQueue);
+    for (auto comm : comms) {
+        comm->eval(store, tid, workQueue);
     }
-    else {
-        TaskP task(new Task(right));
-        workQueue.enqueue(task);
-        left->eval(store, tid, workQueue);
-        while(!(task->isDone()));
-    }
+    // if (notInterleavable(left, right)) {
+    //     left->eval(store, tid, workQueue);
+    //     right->eval(store, tid, workQueue);
+    // }
+    // else {
+    //     TaskP task(new Task(right));
+    //     workQueue.enqueue(task);
+    //     left->eval(store, tid, workQueue);
+    //     while(!(task->isDone()));
+    // }
 #endif
 }
 
 void SeqComm::readsFrom(VarSet& set) const {
-    left->readsFrom(set);
-    right->readsFrom(set);
+    for (auto comm : comms) {
+        comm->readsFrom(set);
+    }
 }
 
 void SeqComm::writesTo(VarSet& set) const {
-    left->writesTo(set);
-    right->writesTo(set);
+    for (auto comm : comms) {
+        comm->writesTo(set);
+    }
 }
 
 void IfComm::eval(Store& store, int tid, CQ& workQueue) const {

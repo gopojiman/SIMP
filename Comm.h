@@ -84,12 +84,10 @@ class AssignLoopRefComm: public Comm {
 
 class SeqComm: public Comm {
     private:
-        const CommP left;
-        const CommP right;
+        const list<CommP> comms;
 
     public:
-        SeqComm(CommP& left, CommP& right):
-            left(move(left)),right(move(right)) {};
+        SeqComm(list<CommP> comms): comms(comms) {};
         void eval(Store& store, int tid, CQ& workQueue) const;
         void readsFrom(VarSet& set) const;
         void writesTo(VarSet& set) const;
