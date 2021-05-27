@@ -14,6 +14,7 @@ class Comm {
 
 // Alias for Comm smart pointer
 typedef unique_ptr<const Comm> CommP;
+typedef moodycamel::ConcurrentQueue<CommP> CQ;
 
 // true -> c2 depends on c1
 bool notInterleavable(const CommP& c1, const CommP& c2);

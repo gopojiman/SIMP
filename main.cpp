@@ -3,12 +3,21 @@
 #include "Parser.h"
 #include "Util.h"
 
-atomic_int finished_threads(0);
-
-void thread_func(int tid) {
-    cout << tid;
-    atomic_fetch_add(&finished_threads, 1);
-    cout << finished_threads.load();
+void thread_func(int tid, atomic_int *finished_threads, Store *store, CQ *workQueue) {
+    CommP comm;
+    bool finished = false;
+    while (finished_threads->load() < Util::n_threads) {
+        if (workQueue->try_dequeue(comm)) {
+            if (finished) {
+                finished = false;
+                atomic_fetch_add(finished_threads, -1);
+            }
+            comm->eval(*store, tid);
+        } else if (!finished) {
+            finished = true;
+            atomic_fetch_add(finished_threads, 1);
+        }
+    }
 }
 
 int main(int argc, char** argv) {
@@ -53,9 +62,13 @@ int main(int argc, char** argv) {
 #ifdef NOPARALLEL
     comm->eval(store, 0);
 #else
+    atomic_int finished_threads(0);
     thread threads[Util::n_threads];
+    CQ workQueue;
+    workQueue.enqueue(move(comm));
+
     for (int i = 0; i < Util::n_threads; i++) {
-        threads[i] = thread(thread_func, i);
+        threads[i] = thread(thread_func, i, &finished_threads, &store, &workQueue);
     }
     for (int i = 0; i < Util::n_threads; i++) {
         threads[i].join();
