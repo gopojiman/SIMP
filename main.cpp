@@ -1,6 +1,15 @@
 #include <fstream>
+#include <atomic>
 #include "Parser.h"
 #include "Util.h"
+
+atomic_int finished_threads(0);
+
+void thread_func(int tid) {
+    cout << tid;
+    atomic_fetch_add(&finished_threads, 1);
+    cout << finished_threads.load();
+}
 
 int main(int argc, char** argv) {
     Store store;
@@ -41,6 +50,16 @@ int main(int argc, char** argv) {
     CommP comm = parser->parseComm();
     delete parser;
 
+#ifdef NOPARALLEL
     comm->eval(store, 0);
+#else
+    thread threads[Util::n_threads];
+    for (int i = 0; i < Util::n_threads; i++) {
+        threads[i] = thread(thread_func, i);
+    }
+    for (int i = 0; i < Util::n_threads; i++) {
+        threads[i].join();
+    }
+#endif
     cout << store << endl;
 }
