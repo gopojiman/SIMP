@@ -2,7 +2,6 @@
 #define COMM_H
 
 #include "Bexp.h"
-#include "concurrentqueue.h"
 
 class Comm {
     public:
@@ -11,10 +10,6 @@ class Comm {
         virtual void writesTo(VarSet& set) const = 0;
         virtual ~Comm() = default;
 };
-
-// Alias for Comm smart pointer
-typedef unique_ptr<const Comm> CommP;
-typedef moodycamel::ConcurrentQueue<CommP> CQ;
 
 // true -> c2 depends on c1
 bool notInterleavable(const CommP& c1, const CommP& c2);
