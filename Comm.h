@@ -15,21 +15,20 @@ typedef moodycamel::ConcurrentQueue<TaskP> CQ;
 // Automatically enqueues children to the workQueue if num_parents is
 // decreased to 0.
 class Task {
-    private:
-        const CommP comm;     
+    private:    
         atomic_bool done;
         atomic_int num_parents;
         CQ& workQueue;
     
     public:
+        const CommP comm; 
         list<TaskP> children;
         Task(CommP comm, CQ& workQueue):
             comm(comm),done(false),num_parents(0),workQueue(workQueue) {};
-        Task(CommP comm, int num_parents, CQ& workQueue):
-            comm(comm),done(false),num_parents(num_parents),workQueue(workQueue) {};
         bool isDone() {return done.load();};
         void eval(Store& store, int tid);
         int decrement_parents();
+        void init_parents(int n_parents) {num_parents.store(n_parents);};
 };
 
 class Comm {

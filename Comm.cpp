@@ -68,22 +68,34 @@ void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
     }
 #else
     list<TaskP> taskList; // list of Tasks we need to wait for
+    list<TaskP> headTaskList; // list of the Tasks with no parents
 
-    auto it = comms.begin();
-    TaskP headTask(new Task(*it, workQueue));
-    taskList.push_back(headTask);
-
-    // create DDG
-    TaskP prev = headTask;
-    for (++it; it != comms.end(); ++it) {
-        TaskP curTask(new Task(*it, 1, workQueue));
-        taskList.push_back(curTask);
-        prev->children.push_back(curTask);
-        prev = curTask;
+    // Make the DDG
+    for (auto comm : comms) {
+        TaskP task(new Task(comm, workQueue));
+        int num_parents = 0;
+        for (auto task2 : taskList) {
+            if (notInterleavable(task2->comm, task->comm)) {
+                task2->children.push_back(task);
+                num_parents++;
+            }
+        }
+        taskList.push_back(task);
+        if (num_parents == 0) {
+            headTaskList.push_back(task);
+        }
+        else {
+            task->init_parents(num_parents);
+        }
     }
-    workQueue.enqueue(headTask);
 
-    // we only need to wait for the Tasks with no children
+    // Enqueue all the head tasks
+    for (auto headTask : headTaskList) {
+        workQueue.enqueue(headTask);
+    }
+
+    // we only need to wait for the Tasks with no children,
+    // prune the rest
     auto taskIt = taskList.begin();
         while (taskIt != taskList.end()) {
             if (!((*taskIt)->children.empty())) {
@@ -94,7 +106,8 @@ void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
             }
     }
 
-    // wait for all the tasks to finish
+    // wait for all the tasks to finish and execute tasks
+    // in the meantime
     while(!taskList.empty()) {
         TaskP task;
         if (workQueue.try_dequeue(task)) {
