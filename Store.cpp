@@ -47,32 +47,30 @@ ostream& operator << (ostream& os, const ValueP& valueP) {
     }
 }
 
+Store::Store(VarSet& varSet) {
+    loopVarMap.resize(Util::n_threads);
+    for (auto x : varSet.valueList) {
+        varMap[x] = defaultValue;
+    }
+    for (auto x : varSet.anrList) {
+        varMap[x.name] = defaultValue;
+    }
+    for (auto x : varSet.alrList) {
+        varMap[x.name] = defaultValue;
+    }
+}
+
 void Store::put(string key, ValueP valueP) {
-#ifndef NOPARALLEL
-    varMapMutex.lock();
-#endif
     varMap[key] = move(valueP);
-#ifndef NOPARALLEL
-    varMapMutex.unlock();
-#endif
 }
 
 ValueP& Store::get(string key) {
-#ifndef NOPARALLEL
-    varMapMutex.lock_shared();
-#endif
     auto it = varMap.find(key);
     if (it != varMap.end()) {
         ValueP& ret = it->second;
-#ifndef NOPARALLEL
-        varMapMutex.unlock_shared();
-#endif
         return ret;
     }
     else {
-#ifndef NOPARALLEL
-        varMapMutex.unlock_shared();
-#endif
         return defaultValue;
     }
 }

@@ -21,7 +21,6 @@ void thread_func(int tid, atomic_int *finished_threads, Store *store, CQ *workQu
 }
 
 int main(int argc, char** argv) {
-    Store store;
     Parser *parser;
     char *arg;
     
@@ -59,6 +58,9 @@ int main(int argc, char** argv) {
     CommP comm = parser->parseComm();
     delete parser;
     CQ workQueue;
+    VarSet varSet;
+    comm->writesTo(varSet);
+    Store store(varSet);
 
 #ifdef NOPARALLEL
     comm->eval(store, 0, workQueue);

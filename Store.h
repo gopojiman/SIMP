@@ -5,7 +5,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <shared_mutex>
+#include "VarSet.h"
 #include "Util.h"
 using namespace std;
 
@@ -42,14 +42,13 @@ ostream& operator << (ostream& os, const ValueP& valueP);
 
 class Store {
     private:
-        inline static ValueP defaultValue = ValueP(new Value(0));
         map<string, ValueP> varMap;
-        shared_mutex varMapMutex;
     
     public:
         // each loopVar has up to one value per thread
+        inline static ValueP defaultValue = ValueP(new Value(0));
         vector<map<string, int>> loopVarMap;
-        Store() {loopVarMap.resize(Util::n_threads);}
+        Store(VarSet& varSet);
         void put(string key, ValueP valueP);
         ValueP& get(string key);
     

@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <functional>
-#include "VarSet.h"
 #include "Store.h"
 
 // Alias for Binary Aexp Function
