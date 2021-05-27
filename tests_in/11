@@ -14,5 +14,5 @@ f = y[0];
 
 z_size = x_size - 5;
 z = [z_size,0];
-for i in 0, z_size do
+for i in 0, [3,z_size] do
     for j in i + 9 do z[i] = x[j]
