@@ -1,7 +1,7 @@
 #include "Comm.h"
 #include "Util.h"
 
-void Task::eval(Store& store, int tid, CQ& workQueue) {
+void Task::eval(Store& store, int tid) {
     comm->eval(store, tid, workQueue);
     done.store(true);
 }

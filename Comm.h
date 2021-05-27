@@ -11,16 +11,19 @@ typedef shared_ptr<Task> TaskP;
 typedef moodycamel::ConcurrentQueue<TaskP> CQ;
 
 // Wrapper class for Comm that sets an atomic boolean flag
-// after it's evaluated
+// and decrements its children's "parents" value after it's evaluated. 
+// Automatically enqueues itself to the workQueue if "parents" is
+// decreased to 0.
 class Task {
     private:
         const CommP comm;     
         atomic_bool done;
+        CQ& workQueue;
     
     public:
-        Task(CommP comm):comm(comm),done(false) {};
+        Task(CommP comm, CQ& workQueue):comm(comm),done(false),workQueue(workQueue) {};
         bool isDone() {return done.load();};
-        void eval(Store& store, int tid, CQ& workQueue);
+        void eval(Store& store, int tid);
 };
 
 class Comm {
