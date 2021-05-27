@@ -67,29 +67,46 @@ void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
         comm->eval(store, tid, workQueue);
     }
 #else
-    list<TaskP> taskList;
+    list<TaskP> taskList; // list of Tasks we need to wait for
 
     auto it = comms.begin();
     TaskP headTask(new Task(*it, workQueue));
     taskList.push_back(headTask);
 
+    // create DDG
     TaskP prev = headTask;
     for (++it; it != comms.end(); ++it) {
         TaskP curTask(new Task(*it, 1, workQueue));
-        taskList.push_back(headTask);
+        taskList.push_back(curTask);
         prev->children.push_back(curTask);
         prev = curTask;
     }
     workQueue.enqueue(headTask);
 
-    while(true) {
-        if (prev->isDone()) {
-            break;
+    // we only need to wait for the Tasks with no children
+    auto taskIt = taskList.begin();
+        while (taskIt != taskList.end()) {
+            if (!((*taskIt)->children.empty())) {
+                taskIt = taskList.erase(taskIt);
+            }
+            else {
+                ++taskIt;
+            }
+    }
+
+    // wait for all the tasks to finish
+    while(!taskList.empty()) {
+        TaskP task;
+        if (workQueue.try_dequeue(task)) {
+            task->eval(store, tid);
         }
-        else {
-            TaskP task;
-            if (workQueue.try_dequeue(task)) {
-                task->eval(store, tid);
+        taskIt = taskList.begin();
+        while (taskIt != taskList.end()) {
+            if ((*taskIt)->isDone()) {
+                taskIt = taskList.erase(taskIt);
+            }
+            else {
+                ++taskIt;
             }
         }
     }
