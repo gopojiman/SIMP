@@ -130,3 +130,50 @@ void ForComm::readsFrom(VarSet& set) const {
 void ForComm::writesTo(VarSet& set) const {
     body->writesTo(set);
 }
+
+bool check(const VarSet& vs1, const VarSet& vs2) {
+    for (auto x : vs2.valueList) {
+        for (auto y : vs1.valueList) {
+            if (x == y) return true;
+        }
+        for (auto y : vs1.anrList) {
+            if (x == y.name) return true;
+        }
+        for (auto y : vs1.alrList) {
+            if (x == y.name) return true;
+        }
+    }
+    for (auto x : vs2.anrList) {
+        for (auto y : vs1.valueList) {
+            if (x.name == y) return true;
+        }
+        for (auto y : vs1.anrList) {
+            if (x.name == y.name && x.index == y.index) return true;
+        }
+        for (auto y : vs1.alrList) {
+            if (x.name == y.name) return true;
+        }
+    }
+    for (auto x : vs2.alrList) {
+        for (auto y : vs1.valueList) {
+            if (x.name == y) return true;
+        }
+        for (auto y : vs1.anrList) {
+            if (x.name == y.name) return true;
+        }
+        for (auto y : vs1.alrList) {
+            if (x.name == y.name) return true;
+        }
+    }
+    return false;
+}
+
+bool notInterleavable(const CommP& c1, const CommP& c2) {
+    VarSet c1Reads, c1Writes, c2Reads, c2Writes;
+    c1->readsFrom(c1Reads);
+    c1->writesTo(c1Writes);
+    c2->readsFrom(c2Reads);
+    c2->writesTo(c2Writes);
+
+    return (check(c1Writes, c2Reads) || check(c1Writes, c2Writes) || check(c1Reads, c2Writes));
+}

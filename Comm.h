@@ -2,6 +2,7 @@
 #define COMM_H
 
 #include "Bexp.h"
+#include "concurrentqueue.h"
 
 class Comm {
     public:
@@ -13,6 +14,9 @@ class Comm {
 
 // Alias for Comm smart pointer
 typedef unique_ptr<const Comm> CommP;
+
+// true -> c2 depends on c1
+bool notInterleavable(const CommP& c1, const CommP& c2);
 
 class SkipComm: public Comm {
     public:
@@ -119,5 +123,10 @@ class ForComm: public Comm {
         void readsFrom(VarSet& set) const;
         void writesTo(VarSet& set) const;
 };
+
+// All the below classes do not correspond to specific command types in
+// the language, they are intermediary constructs used for parallelism
+
+//  TO_IMPLEMENT
 
 #endif
