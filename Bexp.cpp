@@ -34,7 +34,7 @@ bool CompareBexp::eval(Store& store, int tid) const {
     return true;
 }
 
-void CompareBexp::readsFrom(varSet& set) const {
+void CompareBexp::readsFrom(VarSet& set) const {
     left->readsFrom(set);
     right->readsFrom(set);
 }
@@ -43,7 +43,7 @@ bool NotBexp::eval(Store& store, int tid) const {
     return !(oper->eval(store, tid));
 }
 
-void NotBexp::readsFrom(varSet& set) const {
+void NotBexp::readsFrom(VarSet& set) const {
     oper->readsFrom(set);
 }
 
@@ -51,7 +51,7 @@ bool LogicalBexp::eval(Store& store, int tid) const {
     return func(left->eval(store, tid), right->eval(store, tid));
 }
 
-void LogicalBexp::readsFrom(varSet& set) const {
+void LogicalBexp::readsFrom(VarSet& set) const {
     left->readsFrom(set);
     right->readsFrom(set);
 }

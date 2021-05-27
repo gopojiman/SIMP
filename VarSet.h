@@ -1,5 +1,5 @@
-#ifndef DDG_H
-#define DDG_H
+#ifndef VARSET_H
+#define VARSET_H
 
 #include <list>
 #include <string>
@@ -16,7 +16,7 @@ typedef struct ArrayLoopRefStruct {
 } ALRS;
 
 // Represents a set of Vars and Array Refs
-class varSet {
+class VarSet {
     public:
         list<const string> valueList;
         list<const ANRS> anrList;

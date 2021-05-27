@@ -9,11 +9,11 @@ void AssignComm::eval(Store& store, int tid) const {
     store.put(varName, aexp->eval(store, tid));
 }
 
-void AssignComm::readsFrom(varSet& set) const {
+void AssignComm::readsFrom(VarSet& set) const {
     aexp->readsFrom(set);
 }
 
-void AssignComm::writesTo(varSet& set) const {
+void AssignComm::writesTo(VarSet& set) const {
     set.valueList.push_back(varName);
 }
 
@@ -22,11 +22,11 @@ void AssignNumRefComm::eval(Store& store, int tid) const {
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
 }
 
-void AssignNumRefComm::readsFrom(varSet& set) const {
+void AssignNumRefComm::readsFrom(VarSet& set) const {
     aexp->readsFrom(set);
 }
 
-void AssignNumRefComm::writesTo(varSet& set) const {
+void AssignNumRefComm::writesTo(VarSet& set) const {
     ANRS anrs = {varName, index};
     set.anrList.push_back(anrs);
 }
@@ -36,11 +36,11 @@ void AssignLoopRefComm::eval(Store& store, int tid) const {
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
 }
 
-void AssignLoopRefComm::readsFrom(varSet& set) const {
+void AssignLoopRefComm::readsFrom(VarSet& set) const {
     aexp->readsFrom(set);
 }
 
-void AssignLoopRefComm::writesTo(varSet& set) const {
+void AssignLoopRefComm::writesTo(VarSet& set) const {
     ALRS alrs = {varName, loopVar};
     set.alrList.push_back(alrs);
 }
@@ -50,12 +50,12 @@ void SeqComm::eval(Store& store, int tid) const {
     right->eval(store, tid);
 }
 
-void SeqComm::readsFrom(varSet& set) const {
+void SeqComm::readsFrom(VarSet& set) const {
     left->readsFrom(set);
     right->readsFrom(set);
 }
 
-void SeqComm::writesTo(varSet& set) const {
+void SeqComm::writesTo(VarSet& set) const {
     left->writesTo(set);
     right->writesTo(set);
 }
@@ -69,13 +69,13 @@ void IfComm::eval(Store& store, int tid) const {
     }
 }
 
-void IfComm::readsFrom(varSet& set) const {
+void IfComm::readsFrom(VarSet& set) const {
     cond->readsFrom(set);
     trueComm->readsFrom(set);
     falseComm->readsFrom(set);
 }
 
-void IfComm::writesTo(varSet& set) const {
+void IfComm::writesTo(VarSet& set) const {
     trueComm->writesTo(set);
     falseComm->writesTo(set);
 }
@@ -86,12 +86,12 @@ void WhileComm::eval(Store& store, int tid) const {
     }
 }
 
-void WhileComm::readsFrom(varSet& set) const {
+void WhileComm::readsFrom(VarSet& set) const {
     cond->readsFrom(set);
     body->readsFrom(set);
 }
 
-void WhileComm::writesTo(varSet& set) const {
+void WhileComm::writesTo(VarSet& set) const {
     body->writesTo(set);
 }
 
@@ -120,13 +120,13 @@ void ForComm::eval(Store& store, int tid) const {
     }
 }
 
-void ForComm::readsFrom(varSet& set) const {
+void ForComm::readsFrom(VarSet& set) const {
     start->readsFrom(set);
     end  ->readsFrom(set);
     step ->readsFrom(set);
     body ->readsFrom(set);
 }
 
-void ForComm::writesTo(varSet& set) const {
+void ForComm::writesTo(VarSet& set) const {
     body->writesTo(set);
 }

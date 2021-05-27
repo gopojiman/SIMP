@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <functional>
-#include "DDG.h"
+#include "VarSet.h"
 #include "Store.h"
 
 // Alias for Binary Aexp Function
@@ -17,7 +17,7 @@ class Aexp {
         static map<string, BinAexpFunc> binaryFuncs1;
         virtual ValueP eval(Store& store, int tid) const = 0;
         // if the Aexp reads from a variable, adds it to the set
-        virtual void readsFrom(varSet& set) const = 0;
+        virtual void readsFrom(VarSet& set) const = 0;
         virtual ~Aexp() = default;
 };
 
@@ -32,7 +32,7 @@ class Num: public Aexp {
     public:
         Num(int val):val(val) {};
         ValueP eval(Store& store, int tid) const;
-        void readsFrom(varSet& set) const {};
+        void readsFrom(VarSet& set) const {};
 };
 
 // Represents an integer if length < 0, or an array otherwise
@@ -46,7 +46,7 @@ class ValueAexp: public Aexp {
         ValueAexp(AexpP& length, AexpP& val):
             length(move(length)),val(move(val)) {};
         ValueP eval(Store& store, int tid) const;
-        void readsFrom(varSet& set) const;
+        void readsFrom(VarSet& set) const;
 };
 
 class Var: public Aexp {
@@ -56,7 +56,7 @@ class Var: public Aexp {
     public:
         Var(string name):name(name) {};
         ValueP eval(Store& store, int tid) const;
-        void readsFrom(varSet& set) const;
+        void readsFrom(VarSet& set) const;
 };
 
 class LoopVar: public Aexp {
@@ -66,7 +66,7 @@ class LoopVar: public Aexp {
     public:
         LoopVar(string name):name(name) {};
         ValueP eval(Store& store, int tid) const;
-        void readsFrom(varSet& set) const {};
+        void readsFrom(VarSet& set) const {};
 };
 
 class BinaryAexp: public Aexp {
@@ -79,7 +79,7 @@ class BinaryAexp: public Aexp {
         BinaryAexp(BinAexpFunc& func, AexpP& left, AexpP& right):
             func(func),left(move(left)),right(move(right)) {};
         ValueP eval(Store& store, int tid) const;
-        void readsFrom(varSet& set) const;
+        void readsFrom(VarSet& set) const;
 };
 
 // Array reference with integer index, e.g. a[5]
@@ -91,7 +91,7 @@ class ArrayNumRef: public Aexp {
     public:
         ArrayNumRef(string name, int index):name(name),index(index) {};
         ValueP eval(Store& store, int tid) const;
-        void readsFrom(varSet& set) const;
+        void readsFrom(VarSet& set) const;
 };
 
 // Array reference with a LoopVar, e.g. a[i]
@@ -104,7 +104,7 @@ class ArrayLoopRef: public Aexp {
         ArrayLoopRef(string arrayName, string loopVar):
             arrayName(arrayName),loopVar(loopVar) {};
         ValueP eval(Store& store, int tid) const;
-        void readsFrom(varSet& set) const;
+        void readsFrom(VarSet& set) const;
 };
 
 #endif

@@ -25,7 +25,7 @@ ValueP ValueAexp::eval(Store& store, int tid) const {
     return ValueP(new Value(l, v));
 }
 
-void ValueAexp::readsFrom(varSet& set) const {
+void ValueAexp::readsFrom(VarSet& set) const {
     length->readsFrom(set);
     val   ->readsFrom(set);
 }
@@ -34,7 +34,7 @@ ValueP Var::eval(Store& store, int tid) const {
     return store.get(name);
 }
 
-void Var::readsFrom(varSet& set) const {
+void Var::readsFrom(VarSet& set) const {
     set.valueList.push_back(name);
 }
 
@@ -57,7 +57,7 @@ ValueP BinaryAexp::eval(Store& store, int tid) const {
     return ret;
 }
 
-void BinaryAexp::readsFrom(varSet& set) const {
+void BinaryAexp::readsFrom(VarSet& set) const {
     left->readsFrom(set);
     right->readsFrom(set);
 }
@@ -66,7 +66,7 @@ ValueP ArrayNumRef::eval(Store& store, int tid) const {
     return ValueP(new Value(store.get(name)->at(index)));
 }
 
-void ArrayNumRef::readsFrom(varSet& set) const {
+void ArrayNumRef::readsFrom(VarSet& set) const {
     ANRS anrs = {name, index};
     set.anrList.push_back(anrs);
 }
@@ -76,7 +76,7 @@ ValueP ArrayLoopRef::eval(Store& store, int tid) const {
     return ValueP(new Value(store.get(arrayName)->at(index)));
 }
 
-void ArrayLoopRef::readsFrom(varSet& set) const {
+void ArrayLoopRef::readsFrom(VarSet& set) const {
     ALRS alrs = {arrayName, loopVar};
     set.alrList.push_back(alrs);
 }
