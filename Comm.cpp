@@ -37,7 +37,7 @@ void AssignNumRefComm::writesTo(VarSet& set) const {
 }
 
 void AssignLoopRefComm::eval(Store& store, int tid, CQ& workQueue) const {
-    int index = store.loopVarMap[loopVar]->at(tid);
+    int index = store.loopVarMap[tid][loopVar];
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
 }
 
@@ -119,8 +119,7 @@ void ForComm::eval(Store& store, int tid, CQ& workQueue) const {
     int end   = this->end  ->eval(store, tid)->val();
     int step  = this->step ->eval(store, tid)->val();
 
-    store.loopVarMap[loopVarName] = ArrP(new vector<int>(Util::n_threads));
-    int& loopVar = store.loopVarMap[loopVarName]->at(tid);
+    int& loopVar = store.loopVarMap[tid][loopVarName];
     loopVar = start;
     
     if (step == 0) {

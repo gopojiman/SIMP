@@ -1,5 +1,4 @@
 #include "Store.h"
-#include "Util.h"
 
 // how many elements to print out if not doing full print
 #define SHORT_PRINT_LENGTH 10

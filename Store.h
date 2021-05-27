@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <shared_mutex>
+#include "Util.h"
 using namespace std;
 
 // Array smart pointer
@@ -47,7 +48,8 @@ class Store {
     
     public:
         // each loopVar has up to one value per thread
-        map<string, ArrP> loopVarMap;
+        vector<map<string, int>> loopVarMap;
+        Store() {loopVarMap.resize(Util::n_threads);}
         void put(string key, ValueP valueP);
         ValueP& get(string key);
     

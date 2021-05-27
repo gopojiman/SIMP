@@ -39,7 +39,7 @@ void Var::readsFrom(VarSet& set) const {
 }
 
 ValueP LoopVar::eval(Store& store, int tid) const {
-    return ValueP(new Value(store.loopVarMap[name]->at(tid)));
+    return ValueP(new Value(store.loopVarMap[tid][name]));
 }
 
 ValueP BinaryAexp::eval(Store& store, int tid) const {
@@ -72,7 +72,7 @@ void ArrayNumRef::readsFrom(VarSet& set) const {
 }
 
 ValueP ArrayLoopRef::eval(Store& store, int tid) const {
-    int index = store.loopVarMap[loopVar]->at(tid);
+    int index = store.loopVarMap[tid][loopVar];
     return ValueP(new Value(store.get(arrayName)->at(index)));
 }
 
