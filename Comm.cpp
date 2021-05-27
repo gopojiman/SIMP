@@ -4,6 +4,17 @@
 void Task::eval(Store& store, int tid) {
     comm->eval(store, tid, workQueue);
     done.store(true);
+    for (auto child : children) {
+        int result = child->decrement_parents();
+        if (result <= 0) {
+            workQueue.enqueue(child);
+        }
+    }
+}
+
+int Task::decrement_parents() {
+    const int prev_val = atomic_fetch_add(&num_parents, -1);
+    return prev_val - 1;
 }
 
 void SkipComm::eval(Store& store, int tid, CQ& workQueue) const {
@@ -11,6 +22,7 @@ void SkipComm::eval(Store& store, int tid, CQ& workQueue) const {
 }
 
 void AssignComm::eval(Store& store, int tid, CQ& workQueue) const {
+    cout << tid;
     store.put(varName, aexp->eval(store, tid));
 }
 
@@ -56,19 +68,32 @@ void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
         comm->eval(store, tid, workQueue);
     }
 #else
-    for (auto comm : comms) {
-        comm->eval(store, tid, workQueue);
+    list<TaskP> taskList;
+
+    auto it = comms.begin();
+    TaskP headTask(new Task(*it, workQueue));
+    taskList.push_back(headTask);
+
+    TaskP prev = headTask;
+    for (++it; it != comms.end(); ++it) {
+        TaskP curTask(new Task(*it, 1, workQueue));
+        taskList.push_back(headTask);
+        prev->children.push_back(curTask);
+        prev = curTask;
     }
-    // if (notInterleavable(left, right)) {
-    //     left->eval(store, tid, workQueue);
-    //     right->eval(store, tid, workQueue);
-    // }
-    // else {
-    //     TaskP task(new Task(right));
-    //     workQueue.enqueue(task);
-    //     left->eval(store, tid, workQueue);
-    //     while(!(task->isDone()));
-    // }
+    workQueue.enqueue(headTask);
+
+    while(true) {
+        if (prev->isDone()) {
+            break;
+        }
+        else {
+            TaskP task;
+            if (workQueue.try_dequeue(task)) {
+                task->eval(store, tid);
+            }
+        }
+    }
 #endif
 }
 
