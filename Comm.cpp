@@ -22,7 +22,6 @@ void SkipComm::eval(Store& store, int tid, CQ& workQueue) const {
 }
 
 void AssignComm::eval(Store& store, int tid, CQ& workQueue) const {
-    cout << tid;
     store.put(varName, aexp->eval(store, tid));
 }
 
