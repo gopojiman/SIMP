@@ -19,6 +19,9 @@ class Bexp {
         virtual ~Bexp() = default;
 };
 
+// Alias for Bexp smart pointer
+typedef unique_ptr<const Bexp> BexpP;
+
 class LiteralBexp: public Bexp {
     private:
         const bool val;

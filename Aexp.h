@@ -5,7 +5,6 @@
 #include <functional>
 #include "VarSet.h"
 #include "Store.h"
-#include "Util.h"
 
 // Alias for Binary Aexp Function
 typedef function<int(int, int)> BinAexpFunc;
@@ -21,6 +20,9 @@ class Aexp {
         virtual void readsFrom(VarSet& set) const = 0;
         virtual ~Aexp() = default;
 };
+
+// Alias for Aexp smart pointer
+typedef unique_ptr<const Aexp> AexpP;
 
 // Always represents an integer
 class Num: public Aexp {
