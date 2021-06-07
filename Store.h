@@ -7,7 +7,6 @@
 #include <vector>
 #include "VarSet.h"
 #include "Util.h"
-using namespace std;
 
 // Array smart pointer
 typedef unique_ptr<vector<int>> ArrP;

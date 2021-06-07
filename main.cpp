@@ -1,21 +1,20 @@
 #include <fstream>
-#include <atomic>
 #include "Parser.h"
 #include "Util.h"
 
-void thread_func(int tid, atomic_int *finished_threads, Store *store) {
+void thread_func(int tid, Store *store) {
     TaskP task;
     bool finished = false;
-    while (finished_threads->load() < Util::n_threads) {
+    while (Util::finished_threads.load() < Util::n_threads) {
         if (Util::workQueue.try_dequeue(task)) {
             if (finished) {
                 finished = false;
-                atomic_fetch_add(finished_threads, -1);
+                atomic_fetch_add(&Util::finished_threads, -1);
             }
             task->eval(*store, tid);
         } else if (!finished) {
             finished = true;
-            atomic_fetch_add(finished_threads, 1);
+            atomic_fetch_add(&Util::finished_threads, 1);
         }
     }
 }
@@ -64,14 +63,13 @@ int main(int argc, char** argv) {
 #ifdef NOPARALLEL
     comm->eval(store, 0);
 #else
-    atomic_int finished_threads(0);
     thread threads[Util::n_threads];
 
     TaskP task(new Task(comm));
     Util::workQueue.enqueue(task);
 
     for (int i = 0; i < Util::n_threads; i++) {
-        threads[i] = thread(thread_func, i, &finished_threads, &store);
+        threads[i] = thread(thread_func, i, &store);
     }
     for (int i = 0; i < Util::n_threads; i++) {
         threads[i].join();
