@@ -1,4 +1,5 @@
 #include "Bexp.h"
+#include "Comm.h"
 
 map<string, CompBexpFunc> Bexp::compFuncs = {
     {"==", equal_to<int>()},
@@ -26,12 +27,55 @@ bool CompareBexp::eval(Store& store, int tid) const {
         return func(leftEval->val(), rightEval->val());
     }
     const int maxLen = max(leftEval->length, rightEval->length);
+#ifdef NOPARALLEL
     for (int i = 0; i < maxLen; i++) {
         if (!func(leftEval->at(i), rightEval->at(i))) {
             return false;
         }
     }
     return true;
+#else
+    const int chunk_size = maxLen / Util::n_threads;
+    if (chunk_size < MIN_CHUNK_SIZE) {
+        for (int i = 0; i < maxLen; i++) {
+            if (!func(leftEval->at(i), rightEval->at(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        TaskP taskArr[Util::n_threads];
+        bool results[Util::n_threads];
+        for (int i = 0; i < Util::n_threads; i++) {
+            const int chunk_start = i * chunk_size;
+            const int chunk_end = 
+                (i == (Util::n_threads - 1)) ? maxLen : ((i + 1) * chunk_size);
+            taskArr[i] = TaskP(new Task(
+                            CommP(new PartialCompareBexp(
+                                func, leftEval, rightEval, &results[i], 
+                                chunk_start, chunk_end))));
+        }
+        Util::workQueue.enqueue_bulk(taskArr, Util::n_threads);
+
+        // Wait for all the tasks to finish
+        TaskP task;
+        for (int i = 0; i < Util::n_threads; i++) {
+            while (!taskArr[i]->isDone()) {
+                if (Util::workQueue.try_dequeue(task)) {
+                    task->eval(store, tid);
+                }
+            }
+        }
+
+        for (int i = 0; i < Util::n_threads; i++) {
+            if (!results[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+#endif
 }
 
 void CompareBexp::readsFrom(VarSet& set) const {

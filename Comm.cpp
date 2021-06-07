@@ -214,6 +214,16 @@ void PartialBinaryAexp::eval(Store& store, int tid) const {
     }
 }
 
+void PartialCompareBexp::eval(Store& store, int tid) const {
+    for (int i = chunk_start; i < chunk_end; i++) {
+        if (!func(leftEval->at(i), rightEval->at(i))) {
+            *result = false;
+            return;
+        }
+    }
+    *result = true;
+}
+
 bool check(const VarSet& vs1, const VarSet& vs2) {
     for (auto x : vs2.valueList) {
         for (auto y : vs1.valueList) {

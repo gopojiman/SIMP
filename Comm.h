@@ -162,4 +162,21 @@ class PartialBinaryAexp: public Comm {
 
 };
 
+class PartialCompareBexp: public Comm {
+    private:
+        const CompBexpFunc func;
+        const ValueP leftEval;
+        const ValueP rightEval;
+        bool *result;
+        const int chunk_start;
+        const int chunk_end;
+
+    public:
+        PartialCompareBexp(const CompBexpFunc& func, const ValueP& leftEval, const ValueP& rightEval, bool *result, const int chunk_start, const int chunk_end):
+            func(func),leftEval(leftEval),rightEval(rightEval),result(result),chunk_start(chunk_start),chunk_end(chunk_end) {};
+        void eval(Store& store, int tid) const;
+        void readsFrom(VarSet& set) const {};
+        void writesTo(VarSet& set) const {};
+};
+
 #endif
