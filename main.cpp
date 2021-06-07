@@ -3,11 +3,11 @@
 #include "Parser.h"
 #include "Util.h"
 
-void thread_func(int tid, atomic_int *finished_threads, Store *store, CQ *workQueue) {
+void thread_func(int tid, atomic_int *finished_threads, Store *store) {
     TaskP task;
     bool finished = false;
     while (finished_threads->load() < Util::n_threads) {
-        if (workQueue->try_dequeue(task)) {
+        if (Util::workQueue.try_dequeue(task)) {
             if (finished) {
                 finished = false;
                 atomic_fetch_add(finished_threads, -1);
@@ -57,22 +57,21 @@ int main(int argc, char** argv) {
 
     CommP comm = parser->parseComm();
     delete parser;
-    CQ workQueue;
     VarSet varSet;
     comm->writesTo(varSet);
     Store store(varSet);
 
 #ifdef NOPARALLEL
-    comm->eval(store, 0, workQueue);
+    comm->eval(store, 0);
 #else
     atomic_int finished_threads(0);
     thread threads[Util::n_threads];
 
-    TaskP task(new Task(comm, workQueue));
-    workQueue.enqueue(task);
+    TaskP task(new Task(comm));
+    Util::workQueue.enqueue(task);
 
     for (int i = 0; i < Util::n_threads; i++) {
-        threads[i] = thread(thread_func, i, &finished_threads, &store, &workQueue);
+        threads[i] = thread(thread_func, i, &finished_threads, &store);
     }
     for (int i = 0; i < Util::n_threads; i++) {
         threads[i].join();

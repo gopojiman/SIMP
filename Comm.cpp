@@ -2,12 +2,12 @@
 #include "Util.h"
 
 void Task::eval(Store& store, int tid) {
-    comm->eval(store, tid, workQueue);
+    comm->eval(store, tid);
     done.store(true);
     for (auto child : children) {
         int result = child->decrement_parents();
         if (result <= 0) {
-            workQueue.enqueue(child);
+            Util::workQueue.enqueue(child);
         }
     }
 }
@@ -17,11 +17,11 @@ int Task::decrement_parents() {
     return prev_val - 1;
 }
 
-void SkipComm::eval(Store& store, int tid, CQ& workQueue) const {
+void SkipComm::eval(Store& store, int tid) const {
     return;
 }
 
-void AssignComm::eval(Store& store, int tid, CQ& workQueue) const {
+void AssignComm::eval(Store& store, int tid) const {
     store.put(varName, aexp->eval(store, tid));
 }
 
@@ -34,7 +34,7 @@ void AssignComm::writesTo(VarSet& set) const {
 }
 
 // If aexp evals to an array, the first element is used
-void AssignNumRefComm::eval(Store& store, int tid, CQ& workQueue) const {
+void AssignNumRefComm::eval(Store& store, int tid) const {
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
 }
 
@@ -47,7 +47,7 @@ void AssignNumRefComm::writesTo(VarSet& set) const {
     set.anrList.push_back(anrs);
 }
 
-void AssignLoopRefComm::eval(Store& store, int tid, CQ& workQueue) const {
+void AssignLoopRefComm::eval(Store& store, int tid) const {
     int index = store.loopVarMap[tid][loopVar];
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
 }
@@ -61,10 +61,10 @@ void AssignLoopRefComm::writesTo(VarSet& set) const {
     set.alrList.push_back(alrs);
 }
 
-void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
+void SeqComm::eval(Store& store, int tid) const {
 #ifdef NOPARALLEL
     for (auto comm : comms) {
-        comm->eval(store, tid, workQueue);
+        comm->eval(store, tid);
     }
 #else
     list<TaskP> taskList; // list of Tasks we need to wait for
@@ -72,7 +72,7 @@ void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
 
     // Make the DDG
     for (auto comm : comms) {
-        TaskP task(new Task(comm, workQueue));
+        TaskP task(new Task(comm));
         int num_parents = 0;
         for (auto task2 : taskList) {
             if (notInterleavable(task2->comm, task->comm)) {
@@ -91,7 +91,7 @@ void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
 
     // Enqueue all the head tasks
     for (auto headTask : headTaskList) {
-        workQueue.enqueue(headTask);
+        Util::workQueue.enqueue(headTask);
     }
 
     // we only need to wait for the Tasks with no children,
@@ -110,7 +110,7 @@ void SeqComm::eval(Store& store, int tid, CQ& workQueue) const {
     // in the meantime
     while(!taskList.empty()) {
         TaskP task;
-        if (workQueue.try_dequeue(task)) {
+        if (Util::workQueue.try_dequeue(task)) {
             task->eval(store, tid);
         }
         taskIt = taskList.begin();
@@ -138,12 +138,12 @@ void SeqComm::writesTo(VarSet& set) const {
     }
 }
 
-void IfComm::eval(Store& store, int tid, CQ& workQueue) const {
+void IfComm::eval(Store& store, int tid) const {
     if (cond->eval(store, tid)) {
-        trueComm->eval(store, tid, workQueue);
+        trueComm->eval(store, tid);
     }
     else {
-        falseComm->eval(store, tid, workQueue);
+        falseComm->eval(store, tid);
     }
 }
 
@@ -158,9 +158,9 @@ void IfComm::writesTo(VarSet& set) const {
     falseComm->writesTo(set);
 }
 
-void WhileComm::eval(Store& store, int tid, CQ& workQueue) const {
+void WhileComm::eval(Store& store, int tid) const {
     while (cond->eval(store, tid)) {
-        body->eval(store, tid, workQueue);
+        body->eval(store, tid);
     }
 }
 
@@ -174,7 +174,7 @@ void WhileComm::writesTo(VarSet& set) const {
 }
 
 // If start, end, or step eval to arrays, first element is used
-void ForComm::eval(Store& store, int tid, CQ& workQueue) const {
+void ForComm::eval(Store& store, int tid) const {
     int start = this->start->eval(store, tid)->val();
     int end   = this->end  ->eval(store, tid)->val();
     int step  = this->step ->eval(store, tid)->val();
@@ -183,16 +183,16 @@ void ForComm::eval(Store& store, int tid, CQ& workQueue) const {
     loopVar = start;
     
     if (step == 0) {
-        body->eval(store, tid, workQueue);
+        body->eval(store, tid);
     }
     else if (step > 0) {
         for (; loopVar < end; loopVar += step) {
-            body->eval(store, tid, workQueue);
+            body->eval(store, tid);
         }
     }
     else {
         for (; loopVar > end; loopVar += step) {
-            body->eval(store, tid, workQueue);
+            body->eval(store, tid);
         }
     }
 }
