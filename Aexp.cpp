@@ -1,4 +1,5 @@
 #include "Aexp.h"
+#include "Comm.h"
 
 map<string, BinAexpFunc> Aexp::binaryFuncs0 = {
     {"+", plus<int>()},
