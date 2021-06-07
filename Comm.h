@@ -144,12 +144,22 @@ class ForComm: public Comm {
 // All the below classes do not correspond to specific command types in
 // the language, they are intermediary constructs used for parallelism
 
-// class PartialBinaryAexp: public Comm {
-//     private:
-//         const ValueP leftEval;
-//         const ValueP rightEval;
-//         const ValueP result;
+class PartialBinaryAexp: public Comm {
+    private:
+        const BinAexpFunc func;
+        const ValueP leftEval;
+        const ValueP rightEval;
+        ValueP result;
+        const int chunk_start;
+        const int chunk_end;
 
-// };
+    public:
+        PartialBinaryAexp(const BinAexpFunc& func, const ValueP& leftEval, const ValueP& rightEval, ValueP& result, const int chunk_start, const int chunk_end):
+            func(func),leftEval(leftEval),rightEval(rightEval),result(result),chunk_start(chunk_start),chunk_end(chunk_end) {};
+        void eval(Store& store, int tid) const;
+        void readsFrom(VarSet& set) const {};
+        void writesTo(VarSet& set) const {};
+
+};
 
 #endif

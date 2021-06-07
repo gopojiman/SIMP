@@ -52,9 +52,14 @@ ValueP BinaryAexp::eval(Store& store, int tid) const {
     }
     const int maxLen = max(leftEval->length, rightEval->length);
     ValueP ret(new Value(maxLen, 0));
+#ifdef NOPARALLEL
     for (int i = 0; i < maxLen; i++) {
         ret->put(i, func(leftEval->at(i), rightEval->at(i)));
     }
+#else
+    CommP c(new PartialBinaryAexp(func, leftEval, rightEval, ret, 0, maxLen));
+    c->eval(store, tid);
+#endif
     return ret;
 }
 

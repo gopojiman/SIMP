@@ -208,6 +208,12 @@ void ForComm::writesTo(VarSet& set) const {
     body->writesTo(set);
 }
 
+void PartialBinaryAexp::eval(Store& store, int tid) const {
+    for (int i = chunk_start; i < chunk_end; i++) {
+        result->put(i, func(leftEval->at(i), rightEval->at(i)));
+    }
+}
+
 bool check(const VarSet& vs1, const VarSet& vs2) {
     for (auto x : vs2.valueList) {
         for (auto y : vs1.valueList) {
