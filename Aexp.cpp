@@ -57,8 +57,35 @@ ValueP BinaryAexp::eval(Store& store, int tid) const {
         ret->put(i, func(leftEval->at(i), rightEval->at(i)));
     }
 #else
-    CommP c(new PartialBinaryAexp(func, leftEval, rightEval, ret, 0, maxLen));
-    c->eval(store, tid);
+    const int chunk_size = maxLen / Util::n_threads;
+    if (chunk_size < MIN_CHUNK_SIZE) {
+        for (int i = 0; i < maxLen; i++) {
+            ret->put(i, func(leftEval->at(i), rightEval->at(i)));
+        }
+    }
+    else {
+        TaskP taskArr[Util::n_threads];
+        for (int i = 0; i < Util::n_threads; i++) {
+            const int chunk_start = i * chunk_size;
+            const int chunk_end = 
+                (i == (Util::n_threads - 1)) ? maxLen : ((i + 1) * chunk_size);
+            taskArr[i] = TaskP(new Task(
+                            CommP(new PartialBinaryAexp(
+                                func, leftEval, rightEval, ret, 
+                                chunk_start, chunk_end))));
+        }
+        Util::workQueue.enqueue_bulk(taskArr, Util::n_threads);
+
+        // Wait for all the tasks to finish
+        TaskP task;
+        for (int i = 0; i < Util::n_threads; i++) {
+            while (!taskArr[i]->isDone()) {
+                if (Util::workQueue.try_dequeue(task)) {
+                    task->eval(store, tid);
+                }
+            }
+        }
+    }
 #endif
     return ret;
 }
