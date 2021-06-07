@@ -18,8 +18,8 @@ ValueP Num::eval(Store& store, int tid) const {
 
 // If length or val evaluate to arrays, the first element is used
 ValueP ValueAexp::eval(Store& store, int tid) const {
-    int l = length->eval(store, tid)->val();
-    int v =    val->eval(store, tid)->val();
+    const int l = length->eval(store, tid)->val();
+    const int v =    val->eval(store, tid)->val();
     if (l < 0) {
         return ValueP(new Value(v));
     }
@@ -44,8 +44,8 @@ ValueP LoopVar::eval(Store& store, int tid) const {
 }
 
 ValueP BinaryAexp::eval(Store& store, int tid) const {
-    ValueP leftEval = left->eval(store, tid);
-    ValueP rightEval = right->eval(store, tid);
+    const ValueP leftEval = left->eval(store, tid);
+    const ValueP rightEval = right->eval(store, tid);
     if (leftEval->length < 0 && rightEval->length < 0) {
         int result = func(leftEval->val(), rightEval->val());
         return ValueP(new Value(result));
@@ -68,16 +68,16 @@ ValueP ArrayNumRef::eval(Store& store, int tid) const {
 }
 
 void ArrayNumRef::readsFrom(VarSet& set) const {
-    ANRS anrs = {name, index};
+    const ANRS anrs = {name, index};
     set.anrList.push_back(anrs);
 }
 
 ValueP ArrayLoopRef::eval(Store& store, int tid) const {
-    int index = store.loopVarMap[tid][loopVar];
+    const int index = store.loopVarMap[tid][loopVar];
     return ValueP(new Value(store.get(arrayName)->at(index)));
 }
 
 void ArrayLoopRef::readsFrom(VarSet& set) const {
-    ALRS alrs = {arrayName, loopVar};
+    const ALRS alrs = {arrayName, loopVar};
     set.alrList.push_back(alrs);
 }

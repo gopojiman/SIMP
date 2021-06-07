@@ -43,12 +43,12 @@ void AssignNumRefComm::readsFrom(VarSet& set) const {
 }
 
 void AssignNumRefComm::writesTo(VarSet& set) const {
-    ANRS anrs = {varName, index};
+    const ANRS anrs = {varName, index};
     set.anrList.push_back(anrs);
 }
 
 void AssignLoopRefComm::eval(Store& store, int tid) const {
-    int index = store.loopVarMap[tid][loopVar];
+    const int index = store.loopVarMap[tid][loopVar];
     store.get(varName)->put(index, aexp->eval(store, tid)->val());
 }
 
@@ -57,7 +57,7 @@ void AssignLoopRefComm::readsFrom(VarSet& set) const {
 }
 
 void AssignLoopRefComm::writesTo(VarSet& set) const {
-    ALRS alrs = {varName, loopVar};
+    const ALRS alrs = {varName, loopVar};
     set.alrList.push_back(alrs);
 }
 
@@ -175,9 +175,9 @@ void WhileComm::writesTo(VarSet& set) const {
 
 // If start, end, or step eval to arrays, first element is used
 void ForComm::eval(Store& store, int tid) const {
-    int start = this->start->eval(store, tid)->val();
-    int end   = this->end  ->eval(store, tid)->val();
-    int step  = this->step ->eval(store, tid)->val();
+    const int start = this->start->eval(store, tid)->val();
+    const int end   = this->end  ->eval(store, tid)->val();
+    const int step  = this->step ->eval(store, tid)->val();
 
     int& loopVar = store.loopVarMap[tid][loopVarName];
     loopVar = start;

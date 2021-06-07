@@ -15,8 +15,8 @@ CommP Parser::parseComm() {
 
 void Parser::processToken(string& token) {
     if (token.length() > 1) {
-        char front = token.front();
-        char back = token.back();
+        const char front = token.front();
+        const char back = token.back();
         if (back == ';' || back == '}' || back == ')' || back == ',') {
             token.resize(token.size() - 1);
             processToken(token);
@@ -104,7 +104,7 @@ int Parser::skipToMatchingSquareBracket(const string& token, int i) {
 
 AexpP Parser::parseAexp(int start, int end) {
     if (start == end) {
-        string token = tokens[start];
+        const string& token = tokens[start];
         // Num
         if (!token.empty() && verifyInt(token)) {
                 return AexpP(new Num(stoi(token)));
@@ -128,7 +128,7 @@ AexpP Parser::parseAexp(int start, int end) {
             
             tokens.push_back(token.substr(commaPos + 1, token.length() - commaPos - 2)); // val
             tokens.push_back(token.substr(1, commaPos - 1)); // length
-            int tokensSize = tokens.size();
+            const int tokensSize = tokens.size();
             
             AexpP length = parseAexp(tokensSize - 1, tokensSize - 1);
             AexpP val    = parseAexp(tokensSize - 2, tokensSize - 2);
@@ -137,7 +137,7 @@ AexpP Parser::parseAexp(int start, int end) {
         }
         // ArrayRef
         else if (token.back() == ']') {
-            auto lBracketPos = token.find('[');
+            const auto lBracketPos = token.find('[');
             if (lBracketPos == string::npos) {
                 cerr << "Error: invalid array reference expression" << endl;
                 exit(1);
@@ -165,14 +165,14 @@ AexpP Parser::parseAexp(int start, int end) {
     // Binary Aexps with low precedence
     for (int i = end; i >= start; i--) {
         string token = tokens[i];
-        auto it = Aexp::binaryFuncs0.find(token);
+        const auto it = Aexp::binaryFuncs0.find(token);
         if (it != Aexp::binaryFuncs0.end()) {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
             return AexpP(new BinaryAexp(it->second, left, right));
         }
         if (token == ")") {
-            int nextParen = skipToMatchingParen(i, start);
+            const int nextParen = skipToMatchingParen(i, start);
             if (i == end && nextParen == start) {
                 return parseAexp(start + 1, end - 1);
             }
@@ -182,15 +182,15 @@ AexpP Parser::parseAexp(int start, int end) {
 
     // Binary Aexps with high precedence
     for (int i = end; i >= start; i--) {
-        string token = tokens[i];
-        auto it = Aexp::binaryFuncs1.find(token);
+        const string& token = tokens[i];
+        const auto it = Aexp::binaryFuncs1.find(token);
         if (it != Aexp::binaryFuncs1.end()) {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
             return AexpP(new BinaryAexp(it->second, left, right));
         }
         if (token == ")") {
-            int nextParen = skipToMatchingParen(i, start);
+            const int nextParen = skipToMatchingParen(i, start);
             if (i == end && nextParen == start) {
                 return parseAexp(start + 1, end - 1);
             }
@@ -205,7 +205,7 @@ AexpP Parser::parseAexp(int start, int end) {
 BexpP Parser::parseBexp(int start, int end) {
     // Literal Bexp
     if (start == end) {
-        string token = tokens[start];
+        const string& token = tokens[start];
         if (token == "true") {
             return BexpP(new LiteralBexp(true));
         }
@@ -217,14 +217,14 @@ BexpP Parser::parseBexp(int start, int end) {
     // Logical Bexp
     for (int i = end; i >= start; i--) {
         string token = tokens[i];
-        auto it = Bexp::logFuncs.find(token);
+        const auto it = Bexp::logFuncs.find(token);
         if (it != Bexp::logFuncs.end()) {
             BexpP left = parseBexp(start, i - 1);
             BexpP right = parseBexp(i + 1, end);
             return BexpP(new LogicalBexp(it->second, left, right));
         }
         if (token == ")") {
-            int nextParen = skipToMatchingParen(i, start);
+            const int nextParen = skipToMatchingParen(i, start);
             if (i == end && nextParen == start) {
                 return parseBexp(start + 1, end - 1);
             }
@@ -240,8 +240,8 @@ BexpP Parser::parseBexp(int start, int end) {
 
     // Compare Bexp
     for (int i = end; i >= start; i--) {
-        string token = tokens[i];
-        auto it = Bexp::compFuncs.find(token);
+        const string& token = tokens[i];
+        const auto it = Bexp::compFuncs.find(token);
         if (it != Bexp::compFuncs.end()) {
             AexpP left = parseAexp(start, i - 1);
             AexpP right = parseAexp(i + 1, end);
@@ -266,7 +266,7 @@ CommP Parser::parseComm(int start, int end) {
             semicolonPos = i;
         }
         if (tokens[i] == "}") {
-            int nextBrack = skipToMatchingBracket(i, start);
+            const int nextBrack = skipToMatchingBracket(i, start);
             if (i == end && nextBrack == start) {
                 return parseComm(start + 1, end - 1);
             }
@@ -281,7 +281,7 @@ CommP Parser::parseComm(int start, int end) {
     if (end - start > 4 && tokens[start] == "if") {
         for (int i = start + 2; i < end - 2; i++) {
             if (tokens[i] == "then") {
-                int nextElse = skipToMatchingElse(i, end);
+                const int nextElse = skipToMatchingElse(i, end);
                 BexpP cond = parseBexp(start + 1, i - 1);
                 CommP trueComm = parseComm(i + 1, nextElse - 1);
                 CommP falseComm = parseComm(nextElse + 1, end);
@@ -352,7 +352,7 @@ CommP Parser::parseComm(int start, int end) {
         AexpP aexp = parseAexp(start + 2, end);
         const string& startToken = tokens[start];
         if (startToken.back() == ']') {
-            auto lBracketPos = startToken.find('[');
+            const auto lBracketPos = startToken.find('[');
             if (lBracketPos == string::npos) {
                 cerr << "Error: invalid assign Comm" << endl;
                 exit(1);

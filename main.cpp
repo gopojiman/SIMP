@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    CommP comm = parser->parseComm();
+    const CommP comm = parser->parseComm();
     delete parser;
     VarSet varSet;
     comm->writesTo(varSet);

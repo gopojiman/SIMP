@@ -144,6 +144,12 @@ class ForComm: public Comm {
 // All the below classes do not correspond to specific command types in
 // the language, they are intermediary constructs used for parallelism
 
-//  TO_IMPLEMENT
+// class PartialBinaryAexp: public Comm {
+//     private:
+//         const ValueP leftEval;
+//         const ValueP rightEval;
+//         const ValueP result;
+
+// };
 
 #endif
