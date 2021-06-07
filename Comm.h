@@ -183,4 +183,20 @@ class PartialCompareBexp: public Comm {
         void writesTo(VarSet& set) const {};
 };
 
+class PartialForComm : public Comm {
+    private:
+        const string loopVarName;
+        const int chunk_start;
+        const int chunk_end;
+        const int step;
+        const CommP body;
+    
+    public:
+        PartialForComm(string loopVarName, const int chunk_start, const int chunk_end, const int step, const CommP& body):
+            loopVarName(loopVarName),chunk_start(chunk_start),chunk_end(chunk_end),step(step),body(body) {};
+        void eval(Store& store, int tid) const;
+        void readsFrom(VarSet& set) const {};
+        void writesTo(VarSet& set) const {};
+};
+
 #endif

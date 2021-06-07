@@ -179,6 +179,7 @@ void ForComm::eval(Store& store, int tid) const {
     const int end   = this->end  ->eval(store, tid)->val();
     const int step  = this->step ->eval(store, tid)->val();
 
+#ifdef NOPARALLEL
     int& loopVar = store.loopVarMap[tid][loopVarName];
     loopVar = start;
     
@@ -195,6 +196,54 @@ void ForComm::eval(Store& store, int tid) const {
             body->eval(store, tid);
         }
     }
+#else
+    if (step == 0) {
+        store.loopVarMap[tid][loopVarName] = start;
+        body->eval(store, tid);
+    }
+    else {
+        const int chunk_size = ((end - start) / Util::n_threads) / step;
+        if (notParallelizableLoopBody(body, start, end, step) || chunk_size < MIN_CHUNK_SIZE) {
+            // not parellelizing
+            int& loopVar = store.loopVarMap[tid][loopVarName];
+            loopVar = start;
+            
+            if (step > 0) {
+                for (; loopVar < end; loopVar += step) {
+                    body->eval(store, tid);
+                }
+            }
+            else {
+                for (; loopVar > end; loopVar += step) {
+                    body->eval(store, tid);
+                }
+            }
+        }
+        else {
+            //parallelizing
+            TaskP taskArr[Util::n_threads];
+            for (int i = 0; i < Util::n_threads; i++) {
+                const int chunk_start = i * chunk_size * step + start;
+                const int chunk_end = 
+                    (i == (Util::n_threads - 1)) ? end : ((i + 1) * chunk_size * step + start);
+                taskArr[i] = TaskP(new Task(
+                                CommP(new PartialForComm(
+                                    loopVarName, chunk_start, chunk_end, step, body))));
+            }
+            Util::workQueue.enqueue_bulk(taskArr, Util::n_threads);
+
+            // Wait for all the tasks to finish
+            TaskP task;
+            for (int i = 0; i < Util::n_threads; i++) {
+                while (!taskArr[i]->isDone()) {
+                    if (Util::workQueue.try_dequeue(task)) {
+                        task->eval(store, tid);
+                    }
+                }
+            }
+        }
+    }
+#endif
 }
 
 void ForComm::readsFrom(VarSet& set) const {
@@ -222,6 +271,22 @@ void PartialCompareBexp::eval(Store& store, int tid) const {
         }
     }
     *result = true;
+}
+
+void PartialForComm::eval(Store& store, int tid) const {
+    int& loopVar = store.loopVarMap[tid][loopVarName];
+    loopVar = chunk_start;
+    
+    if (step > 0) {
+        for (; loopVar < chunk_end; loopVar += step) {
+            body->eval(store, tid);
+        }
+    }
+    else {
+        for (; loopVar > chunk_end; loopVar += step) {
+            body->eval(store, tid);
+        }
+    }
 }
 
 bool check(const VarSet& vs1, const VarSet& vs2) {

@@ -5,7 +5,7 @@
 #include <functional>
 #include "Store.h"
 
-#define MIN_CHUNK_SIZE 8192
+#define MIN_CHUNK_SIZE 2
 
 // Alias for Binary Aexp Function
 typedef function<int(int, int)> BinAexpFunc;
