@@ -37,6 +37,10 @@ class Comm {
 // true -> c2 depends on c1
 bool notInterleavable(const CommP& c1, const CommP& c2);
 
+// true -> body is safe to parallelize in a for loop
+bool notParallelizableLoopBody(const CommP& body, const int start, const int end, const int step);
+
+
 class SkipComm: public Comm {
     public:
         void eval(Store& store, int tid) const;

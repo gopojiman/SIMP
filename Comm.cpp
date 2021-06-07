@@ -270,3 +270,62 @@ bool notInterleavable(const CommP& c1, const CommP& c2) {
 
     return (check(c1Writes, c2Reads) || check(c1Writes, c2Writes) || check(c1Reads, c2Writes));
 }
+
+bool checkWithinLoop(const VarSet& vs1, const VarSet& vs2, const int start, const int end, const int step) {
+    for (auto x : vs2.valueList) {
+        for (auto y : vs1.valueList) {
+            if (x == y) return true;
+        }
+        for (auto y : vs1.anrList) {
+            if (x == y.name) return true;
+        }
+        for (auto y : vs1.alrList) {
+            if (x == y.name) return true;
+        }
+    }
+    for (auto x : vs2.anrList) {
+        for (auto y : vs1.valueList) {
+            if (x.name == y) return true;
+        }
+        for (auto y : vs1.anrList) {
+            if (x.name == y.name && x.index == y.index) return true;
+        }
+        for (auto y : vs1.alrList) {
+            if (x.name == y.name) {
+                if (step > 0 && x.index >= start && x.index < end && (x.index - start) % step == 0) {
+                    return true;
+                }
+                if (step < 0 && x.index <= start && x.index > end && (x.index - start) % step == 0) {
+                    return true;
+                }
+            }
+        }
+    }
+    for (auto x : vs2.alrList) {
+        for (auto y : vs1.valueList) {
+            if (x.name == y) return true;
+        }
+        for (auto y : vs1.anrList) {
+            if (x.name == y.name) {
+                if (step > 0 && y.index >= start && y.index < end && (y.index - start) % step == 0) {
+                    return true;
+                }
+                if (step < 0 && y.index <= start && y.index > end && (y.index - start) % step == 0) {
+                    return true;
+                }
+            }
+        }
+        for (auto y : vs1.alrList) {
+            if (x.name == y.name && x.loopVar != y.loopVar) return true;
+        }
+    }
+    return false;
+}
+
+bool notParallelizableLoopBody(const CommP& body, const int start, const int end, const int step) {
+    VarSet reads, writes;
+    body->readsFrom(reads);
+    body->writesTo(writes);
+
+    return (checkWithinLoop(writes, reads, start, end, step) || checkWithinLoop(writes, writes, start, end, step));
+}
