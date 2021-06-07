@@ -1,0 +1,4 @@
+wwww_size = 60;
+wwww = [1035,3];
+for j in 1234567, -7, -3 do
+    wwww[j] = j

@@ -5,7 +5,9 @@
 #include <functional>
 #include "Store.h"
 
-#define MIN_CHUNK_SIZE 2
+// Minimum size of chunks to break array operations and for loops into
+// Lowering to 1 is good for testing
+#define MIN_CHUNK_SIZE 8192
 
 // Alias for Binary Aexp Function
 typedef function<int(int, int)> BinAexpFunc;
